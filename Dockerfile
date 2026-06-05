@@ -15,11 +15,13 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev && npm install drizzle-orm postgres
 
 COPY --from=builder /app/build ./build
+COPY drizzle ./drizzle
+COPY migrate.js ./migrate.js
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["node", "build/index.js"]
+CMD ["sh", "-c", "node migrate.js && node build/index.js"]
