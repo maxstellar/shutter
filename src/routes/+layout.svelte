@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import Nav from '$lib/components/Nav.svelte';
 	import PullToRefresh from '$lib/components/PullToRefresh.svelte';
+	import Onboarding from '$lib/components/Onboarding.svelte';
 	import type { LayoutData } from './$types';
 	import { browser } from '$app/environment';
 
@@ -24,6 +25,7 @@
 	<Nav user={data.user} isAdmin={data.isAdmin} isWhitelisted={data.isWhitelisted} />
 	{#if data.isWhitelisted}
 		<PullToRefresh />
+		<Onboarding />
 	{/if}
 	<main class="flex-1 sm:pb-0" class:content-bottom-padding={data.isWhitelisted}>
 		{@render children()}

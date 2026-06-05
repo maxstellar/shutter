@@ -112,7 +112,7 @@
 	<header
 		class="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-zinc-300 bg-white/90 px-4 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/90"
 	>
-		<a href="/" class="flex items-center gap-2.5">
+		<a href="/" class="flex items-center gap-2.5" data-onboard="capsule-logo">
 			<div
 				class="flex h-7 w-7 items-center justify-center rounded-lg"
 				style="background: linear-gradient(145deg, #ec3750 0%, #c8273a 100%)"
@@ -207,6 +207,7 @@
 			<a
 				href="/upload"
 				aria-label="Upload photo"
+				data-onboard="upload"
 				class="flex h-14 w-16 flex-none items-center justify-center rounded-2xl shadow-md transition-transform active:scale-95"
 				style="background-color:var(--color-accent)"
 			>
@@ -215,6 +216,7 @@
 
 			<a
 				href="/streaks"
+				data-onboard="streaks"
 				class="flex flex-1 flex-col items-center gap-1.5 py-2 text-xs transition-colors"
 				class:bottom-active={active('/streaks')}
 				class:bottom-idle={!active('/streaks')}

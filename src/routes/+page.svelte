@@ -37,7 +37,9 @@
 				day: 'numeric'
 			})}
 		</h1>
-		<DayPicker currentDay={data.today} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
+		<div data-onboard="daypicker">
+			<DayPicker currentDay={data.today} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
+		</div>
 	</div>
 
 	{#if data.prompt}
@@ -49,11 +51,11 @@
 	{/if}
 
 	{#if data.groups.length === 0}
-		<p class="mt-12 text-center text-sm text-zinc-400">
+		<p class="mt-12 text-center text-sm text-zinc-400" data-onboard="album">
 			No photos yet today. <a href="/upload" class="underline underline-offset-2" style="color:var(--color-accent)">Be the first.</a>
 		</p>
 	{:else}
-		<div class="space-y-4">
+		<div class="space-y-4" data-onboard="album">
 			{#each data.groups as group (group.userId)}
 				{@const urls = group.photos.map((p) => p.cdn_url)}
 				<div class="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-[#131315]">
