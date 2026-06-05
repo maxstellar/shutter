@@ -2,7 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-	const THRESHOLD = 120;
+	const THRESHOLD = 160;
 	const CIRCUMFERENCE = 2 * Math.PI * 6;
 
 	let pull = $state(0);
@@ -75,19 +75,43 @@
 {#if visible}
 	<div
 		class="pointer-events-none fixed top-0 left-1/2 z-50 sm:hidden"
-		style="transform: translate(-50%, {translateY}px); transition: {refreshing || done ? 'transform 180ms ease-out' : 'none'}; opacity: {done ? '0' : '1'}; transition: transform 180ms ease-out, opacity 600ms ease-in {done ? '300ms' : '0ms'}"
+		style="transform: translate(-50%, {translateY}px); transition: {refreshing || done
+			? 'transform 180ms ease-out'
+			: 'none'}; opacity: {done
+			? '0'
+			: '1'}; transition: transform 180ms ease-out, opacity 600ms ease-in {done ? '300ms' : '0ms'}"
 	>
-		<div class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md dark:bg-zinc-800">
+		<div
+			class="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-md dark:bg-zinc-800"
+		>
 			{#if done}
 				<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-					<path d="M2.5 7L5.5 10L11.5 4" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+					<path
+						d="M2.5 7L5.5 10L11.5 4"
+						stroke="var(--color-accent)"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
 				</svg>
 			{:else if refreshing}
 				<svg width="16" height="16" viewBox="0 0 16 16" class="animate-spin">
-					<circle cx="8" cy="8" r="6" fill="none" stroke="#e4e4e7" stroke-width="2" class="dark:stroke-zinc-600" />
 					<circle
-						cx="8" cy="8" r="6" fill="none"
-						stroke="var(--color-accent)" stroke-width="2"
+						cx="8"
+						cy="8"
+						r="6"
+						fill="none"
+						stroke="#e4e4e7"
+						stroke-width="2"
+						class="dark:stroke-zinc-600"
+					/>
+					<circle
+						cx="8"
+						cy="8"
+						r="6"
+						fill="none"
+						stroke="var(--color-accent)"
+						stroke-width="2"
 						stroke-dasharray={CIRCUMFERENCE}
 						stroke-dashoffset={CIRCUMFERENCE * 0.75}
 						stroke-linecap="round"
@@ -96,10 +120,22 @@
 				</svg>
 			{:else}
 				<svg width="16" height="16" viewBox="0 0 16 16">
-					<circle cx="8" cy="8" r="6" fill="none" stroke="#e4e4e7" stroke-width="2" class="dark:stroke-zinc-600" />
 					<circle
-						cx="8" cy="8" r="6" fill="none"
-						stroke="var(--color-accent)" stroke-width="2"
+						cx="8"
+						cy="8"
+						r="6"
+						fill="none"
+						stroke="#e4e4e7"
+						stroke-width="2"
+						class="dark:stroke-zinc-600"
+					/>
+					<circle
+						cx="8"
+						cy="8"
+						r="6"
+						fill="none"
+						stroke="var(--color-accent)"
+						stroke-width="2"
 						stroke-dasharray={CIRCUMFERENCE}
 						stroke-dashoffset={dashOffset}
 						stroke-linecap="round"
