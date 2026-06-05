@@ -182,7 +182,7 @@
 			class="w-full rounded-md px-4 py-2.5 text-sm font-medium text-white transition-colors"
 			style="background-color:var(--color-accent)"
 		>
-			Add photo ({remaining} remaining)
+			Add photo{remaining !== 1 ? 's' : ''} ({remaining} remaining)
 		</button>
 	{:else if remaining === 0}
 		<p class="text-center text-sm text-zinc-500">All 5 slots filled for today.</p>
