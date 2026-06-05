@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { navigating } from '$app/state';
 	import { Plus } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import UserAvatar from './UserAvatar.svelte';
@@ -18,7 +17,7 @@
 		isWhitelisted
 	}: { user: User | null; isAdmin: boolean; isWhitelisted: boolean } = $props();
 
-	let path = $derived(navigating?.to?.url?.pathname ?? $page.url.pathname);
+	let path = $derived($page.url.pathname);
 
 	function active(href: string) {
 		return path === href || path.startsWith(href + '/');
@@ -237,16 +236,18 @@
 	.nav-idle {
 		color: #71717a;
 	}
-	.nav-idle:hover {
-		background-color: #f4f4f5;
-		color: #09090b;
-	}
 	:global(html.dark) .nav-idle {
 		color: #a1a1aa;
 	}
-	:global(html.dark) .nav-idle:hover {
-		background-color: #27272a;
-		color: #fafafa;
+	@media (hover: hover) {
+		.nav-idle:hover {
+			background-color: #f4f4f5;
+			color: #09090b;
+		}
+		:global(html.dark) .nav-idle:hover {
+			background-color: #27272a;
+			color: #fafafa;
+		}
 	}
 
 	.bottom-active {
