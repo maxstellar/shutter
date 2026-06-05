@@ -4,7 +4,7 @@
 
 <div class="flex min-h-[calc(100dvh-3rem)] items-center justify-center px-4">
 	<div class="w-full max-w-sm text-center">
-		<h1 class="mb-2 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+		<h1 class="mb-2 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
 			You're not an intern!
 		</h1>
 		<p class="mb-8 text-sm text-zinc-500">

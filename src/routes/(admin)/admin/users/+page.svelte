@@ -25,11 +25,11 @@
 <div class="mx-auto max-w-3xl px-4 py-6 sm:max-w-2xl sm:py-12">
 	<div class="mb-6 flex items-center gap-3">
 		<a href="/admin" class="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">← Admin</a>
-		<h1 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Users</h1>
+		<h1 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Users</h1>
 		<span class="text-sm text-zinc-400">{data.members.length} members</span>
 	</div>
 
-	<div class="overflow-hidden rounded-md border border-zinc-300 dark:border-zinc-800">
+	<div class="overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 dark:border-zinc-800 dark:bg-[#131315]">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b border-zinc-300 text-left dark:border-zinc-800">

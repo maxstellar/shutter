@@ -6,7 +6,9 @@
 
 	// Track select value locally so toggles react before save
 	let selectValue = $state(data.reminderHour != null ? String(data.reminderHour) : '');
-	$effect(() => { selectValue = data.reminderHour != null ? String(data.reminderHour) : ''; });
+	$effect(() => {
+		selectValue = data.reminderHour != null ? String(data.reminderHour) : '';
+	});
 	let noReminder = $derived(data.reminderHour == null);
 
 	let reminderSaved = $state(false);
@@ -14,7 +16,9 @@
 	function showSaved() {
 		if (savedTimer) clearTimeout(savedTimer);
 		reminderSaved = true;
-		savedTimer = setTimeout(() => { reminderSaved = false; }, 2500);
+		savedTimer = setTimeout(() => {
+			reminderSaved = false;
+		}, 2500);
 	}
 
 	let pushSupported = $state(false);
@@ -95,107 +99,125 @@
 </svelte:head>
 
 <div class="mx-auto max-w-2xl px-6 py-8 sm:py-12">
-	<h1 class="mb-6 text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">Settings</h1>
+	<h1 class="mb-6 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+		Settings
+	</h1>
 
 	<!-- Reminder time -->
 	<section class="mb-8">
-		<h2 class="mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">Daily reminder</h2>
-		<p class="mb-3 text-xs text-zinc-500">All times are Eastern Time (ET). Controls both push and Slack reminders.</p>
-		<form
-			method="POST"
-			action="?/saveReminder"
-			use:enhance={() => async ({ result, update }) => {
-				await update();
-				if (result.type === 'success') showSaved();
-			}}
-			class="flex items-center gap-3"
-		>
-			<select
-				name="hour"
-				bind:value={selectValue}
-				class="rounded-md border border-zinc-300 bg-white py-1.5 pl-2.5 pr-9 text-sm text-zinc-900 focus:outline-none focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Daily reminder</h2>
+		<div class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
+			<form
+				method="POST"
+				action="?/saveReminder"
+				use:enhance={() =>
+					async ({ result, update }) => {
+						await update();
+						if (result.type === 'success') showSaved();
+					}}
+				class="flex items-center gap-3"
 			>
-				<option value="">No reminder</option>
-				{#each Array(24) as _, h}
-					<option value={String(h)}>{h === 0 ? '12:00 AM' : h < 12 ? `${h}:00 AM` : h === 12 ? '12:00 PM' : `${h - 12}:00 PM`}</option>
-				{/each}
-			</select>
-			<button
-				type="submit"
-				class="rounded-md border border-zinc-300 px-3 py-1.5 text-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
-			>
-				Save
-			</button>
-		</form>
+				<select
+					name="hour"
+					bind:value={selectValue}
+					class="rounded-md border border-zinc-300 bg-white py-1.5 pr-9 pl-2.5 text-sm text-zinc-900 focus:ring-2 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+				>
+					<option value="">No reminder</option>
+					{#each Array(24) as _, h}
+						<option value={String(h)}
+							>{h === 0
+								? '12:00 AM'
+								: h < 12
+									? `${h}:00 AM`
+									: h === 12
+										? '12:00 PM'
+										: `${h - 12}:00 PM`}</option
+						>
+					{/each}
+				</select>
+				<button
+					type="submit"
+					class="rounded-md border border-zinc-300 px-3 py-1.5 text-sm transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+				>
+					Save
+				</button>
+			</form>
+		</div>
 	</section>
 
 	<!-- Reminders -->
 	<section class="mb-8">
-			<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Reminders</h2>
-			<div class="divide-y divide-zinc-200 rounded-md border border-zinc-300 dark:divide-zinc-800 dark:border-zinc-800">
+		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Reminders</h2>
+		<div
+			class="divide-y divide-zinc-200 rounded-md border border-zinc-300 bg-zinc-50 dark:divide-zinc-800 dark:border-zinc-800 dark:bg-[#131315]"
+		>
+			<div class="flex items-center justify-between px-4 py-3">
+				<div class:opacity-40={noReminder}>
+					<p class="text-sm text-zinc-800 dark:text-zinc-200">Push notification</p>
+					<p class="text-xs text-zinc-400">Browser alert on this device</p>
+				</div>
+				<button
+					role="switch"
+					aria-checked={pushEnabled}
+					onclick={pushEnabled ? disablePush : enablePush}
+					disabled={pushLoading || !pushSupported || noReminder}
+					class="toggle"
+					style={pushEnabled ? 'background-color: var(--color-accent)' : ''}
+				>
+					<span class="toggle-dot"></span>
+				</button>
+			</div>
+			{#if data.hasSlack}
 				<div class="flex items-center justify-between px-4 py-3">
 					<div class:opacity-40={noReminder}>
-						<p class="text-sm text-zinc-800 dark:text-zinc-200">Push notification</p>
-						<p class="text-xs text-zinc-400">Browser alert on this device</p>
+						<p class="text-sm text-zinc-800 dark:text-zinc-200">Slack DM</p>
+						<p class="text-xs text-zinc-400">Direct message in Hack Club Slack</p>
 					</div>
-					<button
-						role="switch"
-						aria-checked={pushEnabled}
-						onclick={pushEnabled ? disablePush : enablePush}
-						disabled={pushLoading || !pushSupported || noReminder}
-						class="toggle"
-						style={pushEnabled ? 'background-color: var(--color-accent)' : ''}
-					>
-						<span class="toggle-dot"></span>
-					</button>
+					<form method="POST" action="?/saveSlackNotify" use:enhance>
+						<input type="hidden" name="enabled" value={data.slackNotify ? '0' : '1'} />
+						<button
+							type="submit"
+							role="switch"
+							aria-checked={data.slackNotify}
+							class="toggle"
+							disabled={noReminder}
+							style={data.slackNotify ? 'background-color: var(--color-accent)' : ''}
+						>
+							<span class="toggle-dot"></span>
+						</button>
+					</form>
 				</div>
-				{#if data.hasSlack}
-					<div class="flex items-center justify-between px-4 py-3">
-						<div class:opacity-40={noReminder}>
-							<p class="text-sm text-zinc-800 dark:text-zinc-200">Slack DM</p>
-							<p class="text-xs text-zinc-400">Direct message in Hack Club Slack</p>
-						</div>
-						<form method="POST" action="?/saveSlackNotify" use:enhance>
-							<input type="hidden" name="enabled" value={data.slackNotify ? '0' : '1'} />
-							<button
-								type="submit"
-								role="switch"
-								aria-checked={data.slackNotify}
-								class="toggle"
-								disabled={noReminder}
-								style={data.slackNotify ? 'background-color: var(--color-accent)' : ''}
-							>
-								<span class="toggle-dot"></span>
-							</button>
-						</form>
-					</div>
-				{/if}
-			</div>
-			{#if pushError}
-				<p class="mt-2 text-xs text-red-500">{pushError}</p>
 			{/if}
+		</div>
+		{#if pushError}
+			<p class="mt-2 text-xs text-red-500">{pushError}</p>
+		{/if}
 	</section>
 
 	<!-- Sign out -->
 	<section>
 		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Account</h2>
-		<p class="mb-3 text-xs text-zinc-500">
-			Photos submitted to Capsule are stored on the Hack Club CDN and cannot be automatically deleted once uploaded.
-			Contact an admin if you need a photo removed.
-		</p>
-		<form method="POST" action="/logout">
-			<button
-				type="submit"
-				class="text-sm text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
-			>
-				Sign out
-			</button>
-		</form>
+		<div class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
+			<p class="mb-3 text-xs text-zinc-500">
+				Photos submitted to Capsule are stored on the Hack Club CDN and cannot be automatically
+				deleted once uploaded. Contact an admin if you need a photo removed.
+			</p>
+			<form method="POST" action="/logout">
+				<button
+					type="submit"
+					class="text-sm text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+				>
+					Sign out
+				</button>
+			</form>
+		</div>
 	</section>
 </div>
 
 {#if reminderSaved}
-	<div class="fixed bottom-24 left-1/2 -translate-x-1/2 rounded-md bg-zinc-900 px-4 py-2 text-sm text-white shadow-lg sm:bottom-6 dark:bg-zinc-100 dark:text-zinc-900">
+	<div
+		class="fixed bottom-24 left-1/2 -translate-x-1/2 rounded-md bg-zinc-900 px-4 py-2 text-sm text-white shadow-lg sm:bottom-6 dark:bg-zinc-100 dark:text-zinc-900"
+	>
 		Reminder time saved
 	</div>
 {/if}

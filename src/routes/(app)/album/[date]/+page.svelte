@@ -37,13 +37,22 @@
 
 <div class="mx-auto max-w-6xl px-6 py-8 sm:max-w-2xl sm:py-12">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">{formattedDate}</h1>
-		<DayPicker currentDay={data.date} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
+		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+			{formattedDate}
+		</h1>
+		<DayPicker
+			currentDay={data.date}
+			today={data.today}
+			cohortStart={data.cohortStart}
+			cohortEnd={data.cohortEnd}
+		/>
 	</div>
 
 	{#if data.prompt}
-		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-			<p class="mb-0.5 text-xs font-medium uppercase tracking-wide text-zinc-400">Prompt</p>
+		<div
+			class="mb-4 rounded-md border border-zinc-300 bg-zinc-50 px-5 py-4 dark:border-zinc-800 dark:bg-[#131315]"
+		>
+			<p class="mb-0.5 text-xs font-medium tracking-wide text-zinc-400 uppercase">Prompt</p>
 			<p class="text-sm text-zinc-800 dark:text-zinc-200">{data.prompt.text}</p>
 		</div>
 	{/if}
@@ -51,16 +60,18 @@
 	{#if data.groups.length === 0}
 		<p class="mt-12 text-center text-sm text-zinc-400">No photos were submitted on this day.</p>
 	{:else}
-		<div class="space-y-8">
+		<div class="space-y-4">
 			{#each data.groups as group (group.userId)}
 				{@const urls = group.photos.map((p) => p.cdn_url)}
-				<div>
-					<div class="mb-3 flex items-center gap-2">
+				<div
+					class="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-[#131315]"
+				>
+					<div class="mb-4 flex items-center gap-2">
 						<UserAvatar name={group.name} avatarUrl={group.avatarUrl} size={32} />
 						<span class="text-base font-medium text-zinc-700 dark:text-zinc-300">{group.name}</span>
 						<span class="text-sm text-zinc-400">{group.photos.length}/5</span>
 					</div>
-					<div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+					<div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
 						{#each group.photos as photo, i (photo.id)}
 							<button
 								onclick={() => openLightbox(urls, i)}

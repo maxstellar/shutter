@@ -26,11 +26,11 @@
 <div class="mx-auto max-w-2xl px-4 py-6">
 	<div class="mb-6 flex items-center gap-3">
 		<a href="/admin" class="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">← Admin</a>
-		<h1 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Prompts</h1>
+		<h1 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Prompts</h1>
 	</div>
 
 	<!-- Add / edit form -->
-	<form method="POST" use:enhance class="mb-8 rounded-md border border-zinc-300 p-4 dark:border-zinc-800">
+	<form method="POST" use:enhance class="mb-8 rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-[#131315]">
 		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Set a prompt</h2>
 		<div class="mb-3 flex gap-2">
 			<input

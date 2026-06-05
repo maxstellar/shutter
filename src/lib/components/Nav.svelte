@@ -27,7 +27,7 @@
 
 <!-- Desktop top header -->
 <header
-	class="sticky top-0 z-40 hidden border-b border-zinc-300 bg-white/90 backdrop-blur sm:block dark:border-zinc-800 dark:bg-zinc-950/90"
+	class="sticky top-0 z-40 hidden border-b border-zinc-300 bg-white/80 backdrop-blur sm:block dark:border-zinc-800 dark:bg-zinc-950/80"
 >
 	<div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-6">
 		<a href="/" class="mr-auto flex items-center gap-3">
@@ -110,7 +110,7 @@
 <!-- Mobile top bar -->
 {#if user && isWhitelisted}
 	<header
-		class="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-zinc-300 bg-white/90 px-4 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/90"
+		class="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-zinc-300 bg-white/80 px-4 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/80"
 	>
 		<a href="/" class="flex items-center gap-2.5">
 			<div
@@ -157,7 +157,7 @@
 	</header>
 {:else}
 	<header
-		class="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-zinc-300 bg-white/90 px-4 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/90"
+		class="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-zinc-300 bg-white/80 px-4 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/80"
 	>
 		<a href="/" class="flex items-center gap-2.5">
 			<div
@@ -191,7 +191,7 @@
 <!-- Mobile bottom nav -->
 {#if user && isWhitelisted}
 	<nav
-		class="bottom-nav-padding fixed right-0 bottom-0 left-0 z-40 flex items-center border-t border-zinc-300 bg-white/95 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/95"
+		class="bottom-nav-padding fixed right-0 bottom-0 left-0 z-40 flex items-center border-t border-zinc-300 bg-white/80 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/80"
 	>
 		<div class="mx-auto flex w-full max-w-xs items-center gap-14 px-6">
 			<a

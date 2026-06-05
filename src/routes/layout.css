@@ -68,12 +68,16 @@ html.dark {
 body {
 	font-family: var(--font-sans);
 	background-color: var(--color-surface);
+	background-image: radial-gradient(circle, rgba(161, 161, 170, 0.55) 1px, transparent 1px);
+	background-size: 28px 28px;
 	color: #09090b;
 	min-height: 100dvh;
 }
 
 html.dark body {
 	background-color: var(--color-surface-dark);
+	background-image: radial-gradient(circle, rgba(113, 113, 122, 0.32) 1px, transparent 1px);
+	background-size: 28px 28px;
 	color: #fafafa;
 }
 

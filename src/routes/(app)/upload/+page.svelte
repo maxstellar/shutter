@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
-	import { Camera, X } from 'lucide-svelte';
+	import { X } from 'lucide-svelte';
 	import PromptCard from '$lib/components/PromptCard.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 
@@ -86,7 +86,11 @@
 </script>
 
 {#if lightboxPhotos.length > 0}
-	<Lightbox photos={lightboxPhotos} startIndex={lightboxIndex} onclose={() => lightboxPhotos = []} />
+	<Lightbox
+		photos={lightboxPhotos}
+		startIndex={lightboxIndex}
+		onclose={() => (lightboxPhotos = [])}
+	/>
 {/if}
 
 <svelte:head>
@@ -94,9 +98,11 @@
 </svelte:head>
 
 <div class="mx-auto max-w-2xl px-6 py-8 sm:py-12">
-	<h1 class="mb-1 text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">Upload</h1>
+	<h1 class="mb-1 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+		Upload
+	</h1>
 	<p class="mb-6 text-sm text-zinc-500">
-		Add up to 5 photos! You need at least 3 to keep your streak.
+		Add up to 5 photos to the album! You need at least 3 to keep your streak.
 		<br /><br />
 		<strong
 			>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure you
@@ -116,29 +122,29 @@
 	{/if}
 
 	<!-- Photo grid: 5 slots -->
-	<div class="mb-6 grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+	<div class="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-5">
 		{#each data.photos as photo, i (photo.id)}
 			<div class="group relative overflow-hidden rounded-md">
 				<button onclick={() => openLightbox(i)} class="block w-full">
-				<img
-					src={photo.cdn_url}
-					alt=""
-					class="aspect-square w-full object-cover"
-					loading="lazy"
-					onerror={(e) => {
-						const img = e.currentTarget as HTMLImageElement;
-						const attempts = parseInt(img.dataset.attempts ?? '0');
-						if (attempts < 4) {
-							img.dataset.attempts = String(attempts + 1);
-							setTimeout(
-								() => {
-									img.src = photo.cdn_url + '?t=' + Date.now();
-								},
-								1500 * (attempts + 1)
-							);
-						}
-					}}
-				/>
+					<img
+						src={photo.cdn_url}
+						alt=""
+						class="aspect-square w-full object-cover"
+						loading="lazy"
+						onerror={(e) => {
+							const img = e.currentTarget as HTMLImageElement;
+							const attempts = parseInt(img.dataset.attempts ?? '0');
+							if (attempts < 4) {
+								img.dataset.attempts = String(attempts + 1);
+								setTimeout(
+									() => {
+										img.src = photo.cdn_url + '?t=' + Date.now();
+									},
+									1500 * (attempts + 1)
+								);
+							}
+						}}
+					/>
 				</button>
 				<button
 					onclick={() => deletePhoto(photo.id)}
@@ -154,14 +160,28 @@
 			<button
 				onclick={() => fileInput?.click()}
 				disabled={uploading}
-				class="flex aspect-square items-center justify-center rounded-md border border-dashed border-zinc-300 text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-500 disabled:opacity-50 dark:border-zinc-700 dark:hover:border-zinc-600"
+				class="flex aspect-square items-center justify-center rounded-md border border-dashed border-zinc-500 bg-white text-zinc-400 transition-colors hover:border-zinc-900 hover:text-zinc-600 disabled:opacity-50 dark:border-zinc-500 dark:bg-surface-dark dark:text-zinc-500 dark:hover:border-zinc-300 dark:hover:text-zinc-200"
 				aria-label="Add photo"
 			>
 				{#if uploading}
 					<span class="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600"
 					></span>
 				{:else}
-					<Camera size={20} />
+					<svg
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						stroke-linejoin="round"
+						stroke-miterlimit="1.414"
+						viewBox="0 0 32 32"
+						preserveAspectRatio="xMidYMid meet"
+						fill="currentColor"
+						width="35"
+						height="35"
+					>
+						<path
+							d="M18.4941 6.96399C18.2617 5.82149 17.2225 4.96399 16.0007 4.96399C14.7784 4.96399 13.7396 5.82149 13.5073 6.96399C13.5007 6.99623 13.4987 7.02713 13.5008 7.05675C4.84338 7.22758 4 8.61743 4 17.036C4 26.203 5 27.036 16 27.036C27 27.036 28 26.203 28 17.036C28 8.61693 27.1565 7.22741 18.4976 7.05672C18.5017 7.02702 18.5006 6.99613 18.4941 6.96399ZM12 17.036C12 14.8269 13.7909 13.036 16 13.036C18.2091 13.036 20 14.8269 20 17.036C20 19.2451 18.2091 21.036 16 21.036C13.7909 21.036 12 19.2451 12 17.036ZM16 11.036C12.6863 11.036 10 13.7223 10 17.036C10 20.3497 12.6863 23.036 16 23.036C19.3137 23.036 22 20.3497 22 17.036C22 13.7223 19.3137 11.036 16 11.036ZM8 12.536C8.829 12.536 9.5 11.864 9.5 11.036C9.5 10.208 8.829 9.53601 8 9.53601C7.171 9.53601 6.5 10.208 6.5 11.036C6.5 11.864 7.171 12.536 8 12.536Z"
+						/>
+					</svg>
 				{/if}
 			</button>
 		{/if}
@@ -179,10 +199,10 @@
 	{#if remaining > 0 && !uploading}
 		<button
 			onclick={() => fileInput?.click()}
-			class="w-full rounded-md px-4 py-2.5 text-sm font-medium text-white transition-colors"
+			class="w-full rounded-md px-6 py-3.5 text-sm font-medium text-white transition-colors"
 			style="background-color:var(--color-accent)"
 		>
-			Add photo{remaining !== 1 ? 's' : ''} ({remaining} remaining)
+			Upload photo{remaining !== 1 ? 's' : ''} ({remaining} remaining)
 		</button>
 	{:else if remaining === 0}
 		<p class="text-center text-sm text-zinc-500">All 5 slots filled for today.</p>

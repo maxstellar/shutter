@@ -30,7 +30,7 @@
 
 <div class="mx-auto max-w-6xl px-6 py-8 sm:max-w-2xl sm:py-12">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">
+		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
 			{new Date(data.today + 'T12:00:00').toLocaleDateString('en-US', {
 				weekday: 'long',
 				month: 'long',
@@ -43,7 +43,7 @@
 	{#if data.prompt}
 		<PromptCard prompt={data.prompt.text} myCount={data.myPhotoCount} showUploadCta />
 	{:else}
-		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">
+		<div class="mb-8 rounded-md border border-zinc-300 bg-zinc-50 px-5 py-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">
 			No prompt set for today.
 		</div>
 	{/if}
@@ -53,16 +53,16 @@
 			No photos yet today. <a href="/upload" class="underline underline-offset-2" style="color:var(--color-accent)">Be the first.</a>
 		</p>
 	{:else}
-		<div class="space-y-8">
+		<div class="space-y-4">
 			{#each data.groups as group (group.userId)}
 				{@const urls = group.photos.map((p) => p.cdn_url)}
-				<div>
+				<div class="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-[#131315]">
 					<div class="mb-3 flex items-center gap-2">
 						<UserAvatar name={group.name} avatarUrl={group.avatarUrl} size={32} />
 						<span class="text-base font-medium text-zinc-700 dark:text-zinc-300">{group.name}</span>
 						<span class="text-sm text-zinc-400">{group.photos.length}/5</span>
 					</div>
-					<div class="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
+					<div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
 						{#each group.photos as photo, i (photo.id)}
 							<button
 								onclick={() => openLightbox(urls, i)}

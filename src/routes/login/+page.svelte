@@ -8,7 +8,7 @@
 </svelte:head>
 
 <div
-	class="login-page relative flex min-h-[calc(100dvh-3rem)] items-center justify-center overflow-hidden bg-white px-6 py-16 sm:min-h-[calc(100dvh-4rem)] dark:bg-zinc-950"
+	class="login-page relative flex min-h-[calc(100dvh-3rem)] items-center justify-center overflow-hidden bg-white px-6 py-16 sm:min-h-[calc(100dvh-4rem)] dark:bg-surface-dark"
 >
 	<!-- Dot grid -->
 	<div class="dot-grid pointer-events-none absolute inset-0"></div>
@@ -88,21 +88,11 @@
 		<!-- Sign in button -->
 		<a
 			href={data.authorizeUrl}
-			class="sign-in-btn flex w-full items-center justify-center gap-2.5 rounded-xl py-3.5 text-sm font-semibold text-white transition-all duration-150 hover:brightness-110 active:brightness-100 sm:py-4 sm:text-[15px]"
+			class="sign-in-btn flex w-full items-center justify-center gap-1.5 rounded-xl py-3.5 text-sm font-semibold text-white transition-all duration-150 hover:brightness-110 active:brightness-100 sm:py-4 sm:text-[15px]"
 		>
-			<svg
-				width="15"
-				height="15"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2.2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-				<polyline points="10 17 15 12 10 7" />
-				<line x1="15" y1="12" x2="3" y2="12" />
+			<svg fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="24" height="24">
+				<path d="M13.707,15.293c0.391,0.39 0.391,1.024 0,1.414l-4,4c-0.39,0.391 -1.024,0.391 -1.414,0c-0.391,-0.39 -0.391,-1.024 0,-1.414l2.293,-2.293l-7.586,0c-0.552,0 -1,-0.448 -1,-1c0,-0.552 0.448,-1 1,-1l7.586,0l-2.293,-2.293c-0.391,-0.39 -0.391,-1.024 0,-1.414c0.39,-0.391 1.024,-0.391 1.414,0l4,4Z"/>
+				<path d="M19.884,8c0,0 -0.001,0 -0.001,0c-1.7,-0.001 -2.86,0.045 -3.77,0.25c-0.005,0.001 -0.01,0.002 -0.015,0.003c-0.79,0.173 -1.104,0.409 -1.292,0.638c0,0 0,0.001 0,0.001c-0.23,0.282 -0.498,0.834 -0.679,2.043c0,0.001 0,0.002 0,0.003c-0.007,0.048 -0.015,0.097 -0.022,0.147c-0.072,0.516 -0.501,0.915 -1.022,0.915c-0.584,0 -1.049,-0.501 -0.973,-1.08c0.566,-4.332 2.406,-4.92 7.773,-4.92c7,0 8,1 8,10c0,9 -1,10 -8,10c-5.367,0 -7.207,-0.588 -7.773,-4.92c-0.076,-0.579 0.389,-1.08 0.973,-1.08c0.521,0 0.95,0.399 1.022,0.915c0.007,0.05 0.015,0.099 0.022,0.147c0,0.001 0,0.002 0,0.003c0.181,1.209 0.449,1.762 0.679,2.044l0,0c0.188,0.229 0.502,0.465 1.292,0.638c0.005,0.001 0.01,0.002 0.015,0.003c0.91,0.204 2.07,0.25 3.77,0.25c0,0 0.001,0 0.001,0c1.7,0 2.86,-0.046 3.77,-0.25c0.005,-0.001 0.01,-0.002 0.015,-0.003c0.79,-0.173 1.104,-0.409 1.291,-0.638l0.001,0c0.23,-0.282 0.498,-0.835 0.678,-2.043c0.001,-0.001 0.001,-0.003 0.001,-0.005c0.189,-1.247 0.244,-2.848 0.243,-5.061c0,0 0,0 0,0c0.001,-2.213 -0.054,-3.814 -0.243,-5.061c0,-0.002 0,-0.004 -0.001,-0.005c-0.18,-1.208 -0.448,-1.76 -0.678,-2.042c0,0 0,-0.001 -0.001,-0.001c-0.187,-0.229 -0.501,-0.465 -1.291,-0.638c-0.005,-0.001 -0.01,-0.002 -0.015,-0.003c-0.91,-0.205 -2.07,-0.251 -3.77,-0.25Z"/>
 			</svg>
 			Sign in with Hack Club
 		</a>
@@ -173,7 +163,7 @@
 		background: radial-gradient(
 			ellipse 80% 80% at 50% 50%,
 			transparent 35%,
-			rgba(9, 9, 11, 0.95) 100%
+			rgba(14, 14, 16, 0.95) 100%
 		);
 	}
 

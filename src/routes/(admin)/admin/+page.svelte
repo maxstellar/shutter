@@ -45,7 +45,7 @@
 
 <div class="mx-auto max-w-5xl px-6 py-8 sm:max-w-2xl sm:py-12">
 	<div class="mb-6 flex items-center gap-3">
-		<h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">Admin</h1>
+		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">Admin</h1>
 		<span class="rounded-md border border-zinc-300 px-2 py-0.5 text-xs text-zinc-500 sm:text-sm dark:border-zinc-700">
 			{new Date(data.day + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
 		</span>
@@ -104,7 +104,7 @@
 
 		<div class="space-y-4">
 			{#each data.members as member (member.id)}
-				<div class="rounded-md border border-zinc-300 p-4 dark:border-zinc-800">
+				<div class="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-[#131315]">
 					<div class="mb-3 flex items-center justify-between gap-3">
 						<div class="flex items-center gap-2">
 							<UserAvatar name={member.name} avatarUrl={member.avatar_url} size={28} />
