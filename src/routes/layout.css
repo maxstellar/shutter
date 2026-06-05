@@ -1,2 +1,96 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+
+@font-face {
+  font-family: 'Phantom Sans';
+  src:
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff') format('woff'),
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Phantom Sans';
+  src:
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff') format('woff'),
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Phantom Sans';
+  src:
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff') format('woff'),
+    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--color-accent: #ec3750;
+	--color-accent-hover: #d42d43;
+
+	--font-sans: 'Phantom Sans', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
+
+	--color-surface: #ffffff;
+	--color-surface-dark: #0e0e10;
+
+	--color-border: #e4e4e7;
+	--color-border-dark: #27272a;
+}
+
+:root {
+	color-scheme: light;
+	font-size: 17px;
+}
+
+@media (min-width: 640px) {
+	:root {
+		font-size: 18px;
+	}
+}
+
+html.dark {
+	color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: var(--color-surface);
+	color: #09090b;
+	min-height: 100dvh;
+}
+
+html.dark body {
+	background-color: var(--color-surface-dark);
+	color: #fafafa;
+}
+
+.bottom-nav-padding {
+	padding-top: 12px;
+	padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+.content-bottom-padding {
+	padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
+
+@media (display-mode: standalone) {
+	.bottom-nav-padding {
+		padding-bottom: calc(24px + env(safe-area-inset-bottom));
+	}
+	.content-bottom-padding {
+		padding-bottom: calc(100px + env(safe-area-inset-bottom));
+	}
+}

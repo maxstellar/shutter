@@ -1,11 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
-	import PromptCard from '$lib/components/PromptCard.svelte';
 	import DayPicker from '$lib/components/DayPicker.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 
 	let { data }: { data: PageData } = $props();
+
+	let formattedDate = $derived(
+		new Date(data.date + 'T12:00:00').toLocaleDateString('en-US', {
+			weekday: 'long',
+			month: 'long',
+			day: 'numeric'
+		})
+	);
 
 	let lightboxPhotos = $state<string[]>([]);
 	let lightboxIndex = $state(0);
@@ -30,28 +37,19 @@
 
 <div class="mx-auto max-w-6xl px-6 py-8 sm:max-w-2xl sm:py-12">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">
-			{new Date(data.today + 'T12:00:00').toLocaleDateString('en-US', {
-				weekday: 'long',
-				month: 'long',
-				day: 'numeric'
-			})}
-		</h1>
-		<DayPicker currentDay={data.today} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
+		<h1 class="text-2xl font-semibold text-zinc-900 sm:text-3xl dark:text-zinc-100">{formattedDate}</h1>
+		<DayPicker currentDay={data.date} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
 	</div>
 
 	{#if data.prompt}
-		<PromptCard prompt={data.prompt.text} myCount={data.myPhotoCount} showUploadCta />
-	{:else}
-		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900">
-			No prompt set for today.
+		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900">
+			<p class="mb-0.5 text-xs font-medium uppercase tracking-wide text-zinc-400">Prompt</p>
+			<p class="text-sm text-zinc-800 dark:text-zinc-200">{data.prompt.text}</p>
 		</div>
 	{/if}
 
 	{#if data.groups.length === 0}
-		<p class="mt-12 text-center text-sm text-zinc-400">
-			No photos yet today. <a href="/upload" class="underline underline-offset-2" style="color:var(--color-accent)">Be the first.</a>
-		</p>
+		<p class="mt-12 text-center text-sm text-zinc-400">No photos were submitted on this day.</p>
 	{:else}
 		<div class="space-y-8">
 			{#each data.groups as group (group.userId)}

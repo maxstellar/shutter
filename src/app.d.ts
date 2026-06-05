@@ -1,12 +1,22 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+import type { InferSelectModel } from 'drizzle-orm';
+import type { users, sessions } from '$lib/server/db/schema';
+
+type User = InferSelectModel<typeof users>;
+type Session = InferSelectModel<typeof sessions>;
+
 declare global {
 	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
+		interface Locals {
+			user: User | null;
+			session: Session | null;
+			isWhitelisted: boolean;
+			isAdmin: boolean;
+		}
+		interface PageData {
+			user: User | null;
+			isAdmin: boolean;
+			theme: 'light' | 'dark' | null;
+		}
 	}
 }
 
