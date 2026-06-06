@@ -1,13 +1,1 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="512" height="512" rx="130" fill="url(#paint0_linear_10_68)"/>
-<path d="M144 116C114 116 104 136 104 166V216C104 246 96 256 64 256C96 256 104 266 104 296V346C104 376 114 396 144 396" stroke="white" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M368 116C398 116 408 136 408 166V216C408 246 416 256 448 256C416 256 408 266 408 296V346C408 376 398 396 368 396" stroke="white" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M256 312C286.928 312 312 286.928 312 256C312 225.072 286.928 200 256 200C225.072 200 200 225.072 200 256C200 286.928 225.072 312 256 312Z" stroke="white" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M172 196C183.046 196 192 187.046 192 176C192 164.954 183.046 156 172 156C160.954 156 152 164.954 152 176C152 187.046 160.954 196 172 196Z" fill="white"/>
-<defs>
-<linearGradient id="paint0_linear_10_68" x1="192" y1="-6.85453e-07" x2="361" y2="522" gradientUnits="userSpaceOnUse">
-<stop offset="0.253235" stop-color="#ED3750"/>
-<stop offset="1" stop-color="#FF003B"/>
-</linearGradient>
-</defs>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="none" viewBox="0 0 512 512"><rect width="512" height="512" fill="url(#paint0_linear_10_68)" rx="130"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="35" d="M144 116C114 116 104 136 104 166V216C104 246 96 256 64 256C96 256 104 266 104 296V346C104 376 114 396 144 396"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="35" d="M368 116C398 116 408 136 408 166V216C408 246 416 256 448 256C416 256 408 266 408 296V346C408 376 398 396 368 396"/><path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="35" d="M256 312C286.928 312 312 286.928 312 256C312 225.072 286.928 200 256 200C225.072 200 200 225.072 200 256C200 286.928 225.072 312 256 312Z"/><path fill="#fff" d="M172 196C183.046 196 192 187.046 192 176C192 164.954 183.046 156 172 156C160.954 156 152 164.954 152 176C152 187.046 160.954 196 172 196Z"/><defs><linearGradient id="paint0_linear_10_68" x1="192" x2="361" y1="0" y2="522" gradientUnits="userSpaceOnUse"><stop offset=".253" stop-color="#ED3750"/><stop offset="1" stop-color="#FF003B"/></linearGradient></defs></svg>
