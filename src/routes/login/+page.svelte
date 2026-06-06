@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
+	import favicon from '$lib/assets/favicon.svg';
 
 	let { data }: { data: PageData } = $props();
 
@@ -82,25 +83,8 @@
 
 	<!-- Content -->
 	<div class="login-content relative z-10 flex w-full flex-col items-center text-center">
-		<!-- Camera icon badge -->
-		<div class="camera-badge mb-8 flex h-15 w-15 items-center justify-center rounded-[18px]">
-			<svg
-				fill-rule="evenodd"
-				clip-rule="evenodd"
-				stroke-linejoin="round"
-				stroke-miterlimit="1.414"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 32 32"
-				preserveAspectRatio="xMidYMid meet"
-				fill="white"
-				width="53"
-				height="53"
-			>
-				<path
-					d="M13.1716 13.1716L17.4142 8.92893C18.9763 7.36683 21.509 7.36683 23.0711 8.92893C24.6332 10.491 24.6332 13.0237 23.0711 14.5858L18.8284 18.8284L13.1716 13.1716ZM11.7574 11.7574L16 7.51471C18.3432 5.17157 22.1422 5.17157 24.4853 7.51471C26.8284 9.85786 26.8284 13.6568 24.4853 16L16 24.4853C14.8284 25.6569 13.2929 26.2426 11.7574 26.2426C10.7736 26.2426 9.78976 26.0022 8.90168 25.5213C8.40361 25.2516 7.93565 24.9062 7.51468 24.4853C5.17154 22.1421 5.17154 18.3431 7.51468 16L11.7573 11.7573L11.7574 11.7574Z"
-				/>
-			</svg>
-		</div>
+		<!-- App icon badge -->
+		<img src={favicon} alt="" class="camera-badge mb-8 h-15 w-15 rounded-[18px]" />
 
 		<!-- Wordmark -->
 		<h1 class="wordmark mb-5 text-[72px] leading-[0.95] font-normal tracking-tight">
@@ -251,10 +235,6 @@
 			border-radius: clamp(18px, calc(11.33px + 1.042vw), 28px);
 			margin-bottom: clamp(32px, calc(21.33px + 1.667vw), 48px);
 		}
-		.camera-badge svg {
-			width: clamp(53px, calc(29.67px + 3.646vw), 88px) !important;
-			height: clamp(53px, calc(29.67px + 3.646vw), 88px) !important;
-		}
 		.wordmark {
 			font-size: clamp(88px, calc(40px + 7.5vw), 160px);
 			margin-bottom: clamp(20px, calc(12px + 1.25vw), 32px);
@@ -281,7 +261,6 @@
 	}
 
 	.camera-badge {
-		background: linear-gradient(145deg, #ec3750 0%, #c8273a 100%);
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 	}
 
