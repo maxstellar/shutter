@@ -1,34 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { onMount } from 'svelte';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { data }: { data: PageData } = $props();
-
-	let showMobileCard = $state(false);
-	let siteUrl = $state('');
-	let copied = $state(false);
-
-	onMount(() => {
-		siteUrl = window.location.origin;
-		const standalone =
-			window.matchMedia('(display-mode: standalone)').matches ||
-			(navigator as any).standalone === true;
-		if (!standalone && !localStorage.getItem('mobile-card-dismissed')) {
-			showMobileCard = true;
-		}
-	});
-
-	function dismissMobileCard() {
-		showMobileCard = false;
-		localStorage.setItem('mobile-card-dismissed', '1');
-	}
-
-	async function copyLink() {
-		await navigator.clipboard.writeText(siteUrl);
-		copied = true;
-		setTimeout(() => (copied = false), 2000);
-	}
 </script>
 
 <svelte:head>
@@ -84,7 +58,7 @@
 	<!-- Content -->
 	<div class="login-content relative z-10 flex w-full flex-col items-center text-center">
 		<!-- App icon badge -->
-		<img src={favicon} alt="" class="camera-badge mb-8 h-15 w-15 rounded-[18px]" />
+		<img src={favicon} alt="" class="camera-badge mb-8 h-20 w-20 rounded-[22px]" />
 
 		<!-- Wordmark -->
 		<h1 class="wordmark mb-5 text-[72px] leading-[0.95] font-normal tracking-tight">
@@ -128,50 +102,6 @@
 			> on Slack.
 		</p>
 
-		<!-- Desktop: better on mobile card -->
-		{#if showMobileCard}
-			<div
-				class="relative mt-8 hidden w-full rounded-xl border border-zinc-200 bg-white/80 px-4 py-3 text-left backdrop-blur sm:block dark:border-zinc-700 dark:bg-zinc-900/80"
-			>
-				<button
-					onclick={dismissMobileCard}
-					aria-label="Dismiss"
-					class="absolute top-2.5 right-2.5 cursor-pointer text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-				>
-					<svg
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						width="14"
-						height="14"
-						><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg
-					>
-				</button>
-				<p class="mb-0.5 text-xs font-semibold text-zinc-800 dark:text-zinc-100">
-					📱 Capsule is better on mobile!
-				</p>
-				<p class="mb-3 text-xs text-zinc-500">
-					Open Capsule on your phone and add it to your Home Screen for the full app experience.
-				</p>
-				<div
-					class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 dark:border-zinc-700 dark:bg-zinc-800"
-				>
-					<span class="flex-1 truncate font-mono text-[11px] text-zinc-500 dark:text-zinc-400"
-						>{siteUrl}</span
-					>
-					<button
-						onclick={copyLink}
-						class="cursor-pointer text-[11px] font-medium transition-colors"
-						style="color: var(--color-accent)"
-					>
-						{copied ? 'Copied!' : 'Copy'}
-					</button>
-				</div>
-			</div>
-		{/if}
 	</div>
 </div>
 
@@ -230,9 +160,9 @@
 			max-width: clamp(20rem, calc(11rem + 22.5vw), 32rem);
 		}
 		.camera-badge {
-			width: clamp(60px, calc(33.33px + 4.167vw), 100px);
-			height: clamp(60px, calc(33.33px + 4.167vw), 100px);
-			border-radius: clamp(18px, calc(11.33px + 1.042vw), 28px);
+			width: clamp(80px, calc(40px + 6.25vw), 140px);
+			height: clamp(80px, calc(40px + 6.25vw), 140px);
+			border-radius: clamp(22px, calc(12.33px + 1.5vw), 36px);
 			margin-bottom: clamp(32px, calc(21.33px + 1.667vw), 48px);
 		}
 		.wordmark {
@@ -255,7 +185,7 @@
 			height: clamp(24px, calc(16px + 1.25vw), 36px);
 		}
 		.access-note {
-			font-size: clamp(12px, calc(9.33px + 0.417vw), 16px);
+			font-size: clamp(12px, calc(8px + 0.625vw), 18px);
 			margin-top: clamp(20px, calc(15.33px + 1.042vw), 32px);
 		}
 	}
