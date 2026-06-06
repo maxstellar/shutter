@@ -14,13 +14,13 @@
 	<h1 class="page-heading mb-6">Streaks</h1>
 
 	{#if data.myStreak}
-		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
+		<div
+			class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]"
+		>
 			<p class="mb-1 text-xs text-zinc-500">Your streak</p>
 			<div class="flex items-baseline gap-2">
-				<span class="streak-number text-zinc-900 dark:text-zinc-100"
-					>{data.myStreak.current}</span
-				>
-				<span class="text-lg text-zinc-500">day{data.myStreak.current !== 1 ? 's' : ''}</span>
+				<span class="streak-number text-zinc-900 dark:text-zinc-100">{data.myStreak.current}</span>
+				<span class="text-xl text-zinc-500">day{data.myStreak.current !== 1 ? 's' : ''}</span>
 			</div>
 			<p class="mt-1 text-xs text-zinc-400">
 				Longest: {data.myStreak.longest} day{data.myStreak.longest !== 1 ? 's' : ''}
@@ -30,10 +30,12 @@
 
 	<h2 class="mb-3 text-sm font-medium tracking-wide text-zinc-500 uppercase">Leaderboard</h2>
 
-	<div class="overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 dark:border-zinc-800 dark:bg-[#131315]">
+	<div
+		class="overflow-hidden rounded-md border border-zinc-300 bg-zinc-50 dark:border-zinc-800 dark:bg-[#131315]"
+	>
 		{#each data.streaks as member, i (member.id)}
 			<div
-				class="flex items-center gap-3 border-b border-zinc-200 px-3.5 py-3 last:border-0 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
+				class="flex items-center gap-3 border-b border-zinc-200 px-3.5 py-3 transition-colors last:border-0 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-800/50"
 			>
 				<span class="w-5 text-right text-xs text-zinc-400">{i + 1}</span>
 				<UserAvatar name={member.name} avatarUrl={member.avatar_url} size={36} />
@@ -46,12 +48,10 @@
 
 <style>
 	.streak-number {
-		font-family: var(--font-serif);
-		font-weight: 400;
-		font-feature-settings: 'liga', 'dlig', 'kern', 'tnum';
+		font-family: var(--font-sans);
+		font-weight: 600;
 		font-size: 44px;
 		line-height: 1;
 		letter-spacing: -0.01em;
 	}
-
 </style>
