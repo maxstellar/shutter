@@ -10,14 +10,14 @@
 	<title>Streaks - Capsule</title>
 </svelte:head>
 
-<div class="mx-auto w-full px-6 py-8 sm:max-w-2xl sm:py-12">
-	<h1 class="mb-6 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">Streaks</h1>
+<div class="page-container">
+	<h1 class="page-heading mb-6">Streaks</h1>
 
 	{#if data.myStreak}
 		<div class="mb-6 rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
 			<p class="mb-1 text-xs text-zinc-500">Your streak</p>
-			<div class="flex items-baseline gap-1.5">
-				<span class="text-3xl font-semibold text-zinc-900 dark:text-zinc-100"
+			<div class="flex items-baseline gap-2">
+				<span class="streak-number text-zinc-900 dark:text-zinc-100"
 					>{data.myStreak.current}</span
 				>
 				<span class="text-lg text-zinc-500">day{data.myStreak.current !== 1 ? 's' : ''}</span>
@@ -43,3 +43,15 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	.streak-number {
+		font-family: var(--font-serif);
+		font-weight: 400;
+		font-feature-settings: 'liga', 'dlig', 'kern', 'tnum';
+		font-size: 44px;
+		line-height: 1;
+		letter-spacing: -0.01em;
+	}
+
+</style>

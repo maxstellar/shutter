@@ -2,31 +2,40 @@
 @plugin '@tailwindcss/forms';
 
 @font-face {
-  font-family: 'Phantom Sans';
-  src:
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff') format('woff'),
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Zarathustra';
+	src: url('https://hackclub.com/_next/static/media/zarathustra_kerned-s.3i1y5bm1bi7ru.ttf')
+		format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Phantom Sans';
+	src:
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff') format('woff'),
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Regular.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
 }
 @font-face {
-  font-family: 'Phantom Sans';
-  src:
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff') format('woff'),
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff2') format('woff2');
-  font-weight: normal;
-  font-style: italic;
-  font-display: swap;
+	font-family: 'Phantom Sans';
+	src:
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff') format('woff'),
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Italic.woff2') format('woff2');
+	font-weight: normal;
+	font-style: italic;
+	font-display: swap;
 }
 @font-face {
-  font-family: 'Phantom Sans';
-  src:
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff') format('woff'),
-    url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
+	font-family: 'Phantom Sans';
+	src:
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff') format('woff'),
+		url('https://assets.hackclub.com/fonts/Phantom_Sans_0.7/Bold.woff2') format('woff2');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
 }
 
 @variant dark (&:where(.dark, .dark *));
@@ -35,7 +44,9 @@
 	--color-accent: #ec3750;
 	--color-accent-hover: #d42d43;
 
-	--font-sans: 'Phantom Sans', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
+	--font-sans:
+		'Phantom Sans', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif;
+	--font-serif: 'Zarathustra', ui-serif, Georgia, serif;
 
 	--color-surface: #ffffff;
 	--color-surface-dark: #0e0e10;
@@ -47,11 +58,13 @@
 :root {
 	color-scheme: light;
 	font-size: 17px;
+	--header-height: 3rem;
 }
 
 @media (min-width: 640px) {
 	:root {
 		font-size: 18px;
+		--header-height: clamp(64px, calc(48px + 2.5vw), 88px);
 	}
 }
 
@@ -79,6 +92,83 @@ html.dark body {
 	background-image: radial-gradient(circle, rgba(113, 113, 122, 0.32) 1px, transparent 1px);
 	background-size: 28px 28px;
 	color: #fafafa;
+}
+
+/* ── Page-level utilities ── */
+/* Mobile keeps static base values; desktop (sm+) scales fluidly between 640px and 1600px viewport */
+
+.page-container {
+	margin-inline: auto;
+	width: 100%;
+	padding-inline: 24px;
+	padding-block: 32px;
+}
+
+.page-container-wide {
+	margin-inline: auto;
+	width: 100%;
+	padding-inline: 24px;
+	padding-block: 32px;
+}
+
+.page-heading {
+	font-family: var(--font-serif);
+	font-size: 38px;
+	line-height: 1;
+	letter-spacing: -0.015em;
+	font-weight: 400;
+	font-feature-settings: 'liga', 'dlig', 'kern';
+	color: #18181b;
+}
+
+/* Album date header: heading + arrows on a single row.
+   The H1 fills available space; if its natural width exceeds it, the fitText JS action shrinks the font.
+   Otherwise the CSS-defined page-heading size is used. */
+.album-date-row {
+	/* Reserve space for the max possible heading size so dynamic font-size changes
+	   don't shift content below upward. */
+	min-height: 38px;
+}
+
+.album-date-row .page-heading {
+	white-space: nowrap;
+	/* clip horizontally so the JS fitText action can measure scrollWidth vs clientWidth,
+	   but let descenders (y, g, p) show below the line-box without taking layout space */
+	overflow-x: visible;
+	overflow-y: visible;
+	min-width: 0;
+	flex: 1 1 0;
+}
+
+html.dark .page-heading {
+	color: #fafafa;
+}
+
+.page-subtitle {
+	font-size: 14px;
+	color: #71717a;
+}
+
+@media (min-width: 640px) {
+	.page-container {
+		padding-block: clamp(48px, calc(40px + 1.25vw), 60px);
+		padding-inline: clamp(24px, calc(13.33px + 1.667vw), 40px);
+		max-width: clamp(42rem, calc(36.67rem + 15vw), 50rem);
+	}
+	.page-container-wide {
+		padding-block: clamp(48px, calc(40px + 1.25vw), 60px);
+		padding-inline: clamp(24px, calc(13.33px + 1.667vw), 40px);
+		max-width: clamp(72rem, calc(61.33rem + 30vw), 88rem);
+	}
+	.page-heading {
+		font-size: clamp(48px, calc(34px + 2.188vw), 72px);
+	}
+	.album-date-row {
+		min-height: clamp(48px, calc(34px + 2.188vw), 72px);
+	}
+	.page-subtitle {
+		font-size: clamp(14px, calc(11.33px + 0.417vw), 18px);
+	}
 }
 
 .bottom-nav-padding {

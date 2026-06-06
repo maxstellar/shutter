@@ -23,7 +23,7 @@
 	<title>Prompts - Admin - Capsule</title>
 </svelte:head>
 
-<div class="mx-auto max-w-2xl px-4 py-6">
+<div class="page-container">
 	<div class="mb-6 flex items-center gap-3">
 		<a href="/admin" class="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">← Admin</a>
 		<h1 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Prompts</h1>

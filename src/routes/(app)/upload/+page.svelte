@@ -97,11 +97,11 @@
 	<title>Upload - Capsule</title>
 </svelte:head>
 
-<div class="mx-auto max-w-2xl px-6 py-8 sm:py-12">
-	<h1 class="mb-1 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+<div class="page-container">
+	<h1 class="page-heading mb-4.5">
 		Upload
 	</h1>
-	<p class="mb-6 text-sm text-zinc-500">
+	<p class="page-subtitle mb-6">
 		Add up to 5 photos to the album! You need at least 3 to keep your streak.
 		<br /><br />
 		<strong

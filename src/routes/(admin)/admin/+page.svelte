@@ -50,9 +50,9 @@
 	<title>Admin - Capsule</title>
 </svelte:head>
 
-<div class="mx-auto max-w-5xl px-6 py-8 sm:max-w-2xl sm:py-12">
+<div class="page-container">
 	<div class="mb-6 flex items-center gap-3">
-		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">Admin</h1>
+		<h1 class="page-heading">Admin</h1>
 		<button
 			onclick={resetOnboarding}
 			class="cursor-pointer rounded-md border border-zinc-300 px-2 py-0.5 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"

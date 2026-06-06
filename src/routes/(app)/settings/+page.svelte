@@ -98,8 +98,8 @@
 	<title>Settings - Capsule</title>
 </svelte:head>
 
-<div class="mx-auto max-w-2xl px-6 py-8 sm:py-12">
-	<h1 class="mb-6 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+<div class="page-container">
+	<h1 class="page-heading mb-6">
 		Settings
 	</h1>
 

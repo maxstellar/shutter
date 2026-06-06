@@ -26,9 +26,9 @@
 
 <!-- Desktop top header -->
 <header
-	class="sticky top-0 z-40 hidden border-b border-zinc-300 bg-white/90 backdrop-blur sm:block dark:border-zinc-800 dark:bg-zinc-950/90"
+	class="desktop-header sticky top-0 z-40 hidden border-b border-zinc-300 bg-white/90 backdrop-blur sm:block dark:border-zinc-800 dark:bg-zinc-950/90"
 >
-	<div class="mx-auto flex h-16 max-w-6xl items-center gap-6 px-6">
+	<div class="desktop-header-inner mx-auto flex h-16 max-w-6xl items-center gap-6 px-6">
 		<a href="/" class="mr-auto flex items-center gap-3">
 			<div
 				class="flex h-7 w-7 items-center justify-center rounded-lg"
@@ -50,7 +50,7 @@
 					/>
 				</svg>
 			</div>
-			<span class="text-2xl font-semibold tracking-tight" style="color: var(--color-accent)"
+			<span class="text-2xl nav-wordmark" style="color: var(--color-accent)"
 				>Capsule</span
 			>
 		</a>
@@ -132,7 +132,7 @@
 					/>
 				</svg>
 			</div>
-			<span class="text-xl font-semibold tracking-tight" style="color: var(--color-accent)"
+			<span class="text-xl nav-wordmark" style="color: var(--color-accent)"
 				>Capsule</span
 			>
 		</a>
@@ -179,7 +179,7 @@
 					/>
 				</svg>
 			</div>
-			<span class="text-xl font-semibold tracking-tight" style="color: var(--color-accent)"
+			<span class="text-xl nav-wordmark" style="color: var(--color-accent)"
 				>Capsule</span
 			>
 		</a>
@@ -250,6 +250,13 @@
 		}
 	}
 
+	.nav-wordmark {
+		font-family: var(--font-serif);
+		font-weight: 400;
+		font-feature-settings: 'liga', 'dlig', 'kern';
+		letter-spacing: -0.01em;
+	}
+
 	.bottom-active {
 		color: var(--color-accent);
 	}
@@ -258,5 +265,37 @@
 	}
 	:global(html.dark) .bottom-idle {
 		color: #a1a1aa;
+	}
+
+	/* Desktop nav: fluid scaling between 640px and 1600px (matches login page lock) */
+	@media (min-width: 640px) {
+		.desktop-header-inner {
+			height: var(--header-height);
+			gap: clamp(20px, calc(12px + 1.25vw), 32px);
+			padding-left: clamp(20px, calc(12px + 1.25vw), 32px);
+			padding-right: clamp(20px, calc(12px + 1.25vw), 32px);
+		}
+		.desktop-header :global(a > div[style*='linear-gradient']) {
+			width: clamp(28px, calc(18.67px + 1.458vw), 42px);
+			height: clamp(28px, calc(18.67px + 1.458vw), 42px);
+			border-radius: clamp(8px, calc(5.33px + 0.417vw), 12px);
+		}
+		.desktop-header :global(a > div[style*='linear-gradient'] > svg) {
+			width: clamp(22px, calc(14px + 1.25vw), 34px);
+			height: clamp(22px, calc(14px + 1.25vw), 34px);
+		}
+		.desktop-header :global(a > span) {
+			font-size: clamp(24px, calc(18.67px + 0.833vw), 32px);
+		}
+		.desktop-header :global(nav > a) {
+			height: clamp(40px, calc(32px + 1.25vw), 52px);
+			font-size: clamp(16px, calc(13.33px + 0.417vw), 20px);
+			padding-left: clamp(14px, calc(11.33px + 0.417vw), 18px);
+			padding-right: clamp(14px, calc(11.33px + 0.417vw), 18px);
+		}
+		.desktop-header :global(nav > a > svg) {
+			width: clamp(19px, calc(15.67px + 0.521vw), 24px);
+			height: clamp(19px, calc(15.67px + 0.521vw), 24px);
+		}
 	}
 </style>

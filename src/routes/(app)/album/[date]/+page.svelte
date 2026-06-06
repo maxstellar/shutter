@@ -3,6 +3,7 @@
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
 	import DayPicker from '$lib/components/DayPicker.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
+	import { fitText } from '$lib/actions/fitText';
 
 	let { data }: { data: PageData } = $props();
 
@@ -35,9 +36,9 @@
 	<Lightbox photos={lightboxPhotos} startIndex={lightboxIndex} onclose={closeLightbox} />
 {/if}
 
-<div class="mx-auto max-w-6xl px-6 py-8 sm:max-w-2xl sm:py-12">
-	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-100">
+<div class="page-container">
+	<div class="album-date-row mb-6 flex items-center justify-between gap-3">
+		<h1 class="page-heading" use:fitText>
 			{formattedDate}
 		</h1>
 		<DayPicker

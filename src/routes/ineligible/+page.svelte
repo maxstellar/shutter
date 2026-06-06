@@ -2,7 +2,7 @@
 	<title>Not invited - Capsule</title>
 </svelte:head>
 
-<div class="flex min-h-[calc(100dvh-3rem)] items-center justify-center px-4">
+<div class="ineligible-page flex items-center justify-center px-4">
 	<div class="w-full max-w-sm text-center">
 		<h1 class="mb-2 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
 			You're not an intern!
@@ -21,3 +21,9 @@
 		</form>
 	</div>
 </div>
+
+<style>
+	.ineligible-page {
+		min-height: calc(100dvh - var(--header-height) - 1px);
+	}
+</style>
