@@ -25,7 +25,7 @@
 	<Nav user={data.user} isAdmin={data.isAdmin} isWhitelisted={data.isWhitelisted} />
 	{#if data.isWhitelisted}
 		<PullToRefresh />
-		<Onboarding />
+		<Onboarding onboarded={data.user?.onboarded ?? false} />
 {/if}
 	<main class="flex-1 sm:pb-0" class:content-bottom-padding={data.isWhitelisted}>
 		{@render children()}

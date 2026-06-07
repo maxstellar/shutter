@@ -4,11 +4,18 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate } from '$app/navigation';
 
+	let { onboarded = false }: { onboarded?: boolean } = $props();
+
 	beforeNavigate(({ cancel }) => {
 		if (active) cancel();
 	});
 
 	const STORAGE_KEY = 'shutter_onboarded_v1';
+
+	async function markComplete() {
+		localStorage.setItem(STORAGE_KEY, '1');
+		await fetch('/api/onboarding/complete', { method: 'POST' });
+	}
 
 	type Step = {
 		selector: string;
@@ -101,6 +108,7 @@
 		if (
 			$page.url.pathname === '/' &&
 			window.innerWidth < 640 &&
+			!onboarded &&
 			!localStorage.getItem(STORAGE_KEY)
 		) {
 			setTimeout(() => {
@@ -114,7 +122,7 @@
 
 	$effect(() => {
 		if (active && visibleSteps[stepIndex]?.pwa) {
-			localStorage.setItem(STORAGE_KEY, '1');
+			markComplete();
 		}
 	});
 
@@ -129,7 +137,7 @@
 
 	function dismiss() {
 		active = false;
-		localStorage.setItem(STORAGE_KEY, '1');
+		markComplete();
 	}
 
 	let tooltipEl = $state<HTMLDivElement | null>(null);

@@ -28,6 +28,7 @@ export const users = pgTable(
 		email: text('email').notNull(),
 		avatar_url: text('avatar_url'),
 		reminder_hour_local: smallint('reminder_hour_local'),
+		onboarded: boolean('onboarded').notNull().default(false),
 		created_at: tsz('created_at').notNull().defaultNow(),
 		last_seen_at: tsz('last_seen_at')
 	},
