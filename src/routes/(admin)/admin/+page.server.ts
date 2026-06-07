@@ -7,11 +7,13 @@ import {
 	users,
 	daily_prompts,
 	prompt_completions,
-	audit_log
+	audit_log,
+	push_subscriptions
 } from '$lib/server/db/schema';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { adminEditableDays, assertAdminDayEditable, currentETDay } from '$lib/server/time';
 import { isWhitelisted } from '$lib/server/auth/access';
+import { sendPushNotification } from '$lib/server/push';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const { today, yesterday } = adminEditableDays();
@@ -174,5 +176,36 @@ export const actions: Actions = {
 		});
 
 		return { ok: true };
+	},
+
+	testReminder: async (event) => {
+		requireAdmin(event);
+		const userId = event.locals.user!.id;
+
+		const today = currentETDay();
+		const [todayPrompt] = await db
+			.select()
+			.from(daily_prompts)
+			.where(eq(daily_prompts.day, today))
+			.limit(1);
+
+		const promptText = todayPrompt?.text ?? 'Time to post your daily photos!';
+
+		const subs = await db
+			.select()
+			.from(push_subscriptions)
+			.where(eq(push_subscriptions.user_id, userId));
+
+		let sent = 0;
+		for (const sub of subs) {
+			await sendPushNotification(sub.id, sub.endpoint, sub.p256dh, sub.auth, {
+				title: "Don't forget to post your photos!",
+				body: promptText,
+				url: '/upload'
+			});
+			sent++;
+		}
+
+		return { ok: true, sent };
 	}
 };
