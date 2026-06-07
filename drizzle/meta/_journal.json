@@ -15,6 +15,13 @@
       "when": 1780700000000,
       "tag": "0001_add_slack_to_users",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780800000000,
+      "tag": "0002_add_onboarded_to_users",
+      "breakpoints": true
     }
   ]
 }
