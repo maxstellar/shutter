@@ -9,7 +9,7 @@ import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 
 if (!dev) {
-	new Cron('0 * * * *', async () => {
+	new Cron('* * * * *', async () => {
 		console.log('[Cron] reminders firing');
 		try {
 			const res = await fetch(`${env.ORIGIN}/api/cron/reminders`, {
