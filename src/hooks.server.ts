@@ -10,11 +10,17 @@ import { env } from '$env/dynamic/private';
 
 if (!dev) {
 	new Cron('0 * * * *', async () => {
+		console.log('[Cron] reminders firing');
 		try {
-			await fetch(`${env.ORIGIN}/api/cron/reminders`, {
+			const res = await fetch(`${env.ORIGIN}/api/cron/reminders`, {
 				method: 'POST',
 				headers: { Authorization: `Bearer ${env.CRON_SECRET}` }
 			});
+			if (!res.ok) {
+				console.error('[Cron] reminders HTTP error', res.status, await res.text());
+			} else {
+				console.log('[Cron] reminders ok', await res.json());
+			}
 		} catch (err) {
 			console.error('[Cron] reminders error', err);
 		}

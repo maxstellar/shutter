@@ -47,7 +47,7 @@ export const POST: RequestHandler = async (event) => {
 
 	const whitelistedEligible = eligible.filter((u) => isWhitelisted(u.slack_id) && u.photoCount < 3);
 
-	if (whitelistedEligible.length === 0) return json({ sent: 0 });
+	if (whitelistedEligible.length === 0) return json({ sent: 0, hour, day: today });
 
 	// Get today's prompt for the notification body
 	const [todayPrompt] = await db
