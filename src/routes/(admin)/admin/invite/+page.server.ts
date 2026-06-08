@@ -8,10 +8,7 @@ import { sendSlackDM } from '$lib/server/slack';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async () => {
-	const entries = await db
-		.select()
-		.from(whitelist)
-		.orderBy(whitelist.invited_at);
+	const entries = await db.select().from(whitelist).orderBy(whitelist.invited_at);
 	return { whitelist: entries };
 };
 
@@ -22,21 +19,21 @@ export const actions: Actions = {
 		const slackId = (form.get('slack_id') as string)?.trim().toUpperCase();
 
 		if (!slackId) return fail(400, { error: 'Slack user ID is required' });
-		if (!/^[UW][A-Z0-9]+$/.test(slackId)) return fail(400, { error: 'Invalid Slack user ID (should look like U01ABC123)' });
+		if (!/^[UW][A-Z0-9]+$/.test(slackId))
+			return fail(400, { error: 'Invalid Slack user ID (should look like U01ABC123)' });
 
 		await db
 			.insert(whitelist)
 			.values({ slack_id: slackId, invited_by_user_id: event.locals.user!.id })
 			.onConflictDoNothing();
 
-		const appUrl = env.ORIGIN ?? 'https://shutter.hackclub.com';
+		const appUrl = env.ORIGIN ?? 'https://shutter.maxstellar.net';
 		const msg = [
 			`*You've been invited to Shutter!*`,
-			`Shutter is a daily photo challenge — post 3 photos each day matching the prompt and build your streak.`,
 			``,
-			`*Get started:* ${appUrl}`,
+			`Shutter is a daily photo journal for Hack Club interns: post at least 3 photos every day to maintain a streak, with incentives and prizes for the best photos!\nEach day will have a prompt that at least one of your photos must follow! (ex: take a photo with another intern outside of work, at a place you've never been to)\nThe goal is to have around 2000 photos to look back on by the end of the summer!`,
 			``,
-			`*Installing as a PWA:* On iOS tap Share → Add to Home Screen. On Android/Chrome tap the install icon in the address bar.`
+			`*<${appUrl}|Join us on Shutter!>*`
 		].join('\n');
 
 		await sendSlackDM(slackId, msg);
