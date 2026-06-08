@@ -31,7 +31,7 @@ export const actions: Actions = {
 		const msg = [
 			`*You've been invited to Shutter!*`,
 			``,
-			`Shutter is a daily photo journal for Hack Club interns: post at least 3 photos every day to maintain a streak, with incentives and prizes for the best photos!\nEach day will have a prompt that at least one of your photos must follow! (ex: take a photo with another intern outside of work, at a place you've never been to)\nThe goal is to have around 2000 photos to look back on by the end of the summer!`,
+			`Shutter is a daily photo journal for Hack Club interns: post at least 3 photos every day to maintain a streak, with incentives and prizes for the best photos! Each day will have a prompt that at least one of your photos must follow! (ex: take a photo with another intern outside of work, at a place you've never been to)\nAt the end of the summer, if everyone keeps up their streaks, we'll have around 2000 photos to look back on and cherish!`,
 			``,
 			`*<${appUrl}|Join us on Shutter!>*`
 		].join('\n');
