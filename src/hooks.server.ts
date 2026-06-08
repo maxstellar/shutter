@@ -9,7 +9,7 @@ import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 
 if (!dev) {
-	new Cron('* * * * *', async () => {
+	new Cron('0 * * * *', async () => {
 		try {
 			const res = await fetch(`http://localhost:${process.env.PORT ?? 3000}/api/cron/reminders`, {
 				method: 'POST',
