@@ -23,6 +23,7 @@
 
 	let pushSupported = $state(false);
 	let pushEnabled = $state(false);
+	let isPWA = $state(false);
 
 	$effect(() => {
 		pushEnabled = data.subscriptionCount > 0;
@@ -32,6 +33,9 @@
 
 	$effect(() => {
 		pushSupported = 'serviceWorker' in navigator && 'PushManager' in window;
+		isPWA =
+			window.matchMedia('(display-mode: standalone)').matches ||
+			('standalone' in navigator && (navigator as { standalone?: boolean }).standalone === true);
 	});
 
 	function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
@@ -151,22 +155,24 @@
 		<div
 			class="divide-y divide-zinc-200 rounded-md border border-zinc-300 bg-zinc-50 dark:divide-zinc-800 dark:border-zinc-800 dark:bg-[#131315]"
 		>
-			<div class="flex items-center justify-between px-4 py-3">
-				<div class:opacity-40={noReminder}>
-					<p class="text-sm text-zinc-800 dark:text-zinc-200">Push notification</p>
-					<p class="text-xs text-zinc-400">Browser alert on this device</p>
+			{#if isPWA}
+				<div class="flex items-center justify-between px-4 py-3">
+					<div class:opacity-40={noReminder}>
+						<p class="text-sm text-zinc-800 dark:text-zinc-200">Push notification</p>
+						<p class="text-xs text-zinc-400">Browser alert on this device</p>
+					</div>
+					<button
+						role="switch"
+						aria-checked={pushEnabled}
+						onclick={pushEnabled ? disablePush : enablePush}
+						disabled={pushLoading || !pushSupported || noReminder}
+						class="toggle"
+						style={pushEnabled ? 'background-color: var(--color-accent)' : ''}
+					>
+						<span class="toggle-dot"></span>
+					</button>
 				</div>
-				<button
-					role="switch"
-					aria-checked={pushEnabled}
-					onclick={pushEnabled ? disablePush : enablePush}
-					disabled={pushLoading || !pushSupported || noReminder}
-					class="toggle"
-					style={pushEnabled ? 'background-color: var(--color-accent)' : ''}
-				>
-					<span class="toggle-dot"></span>
-				</button>
-			</div>
+			{/if}
 			{#if data.hasSlack}
 				<div class="flex items-center justify-between px-4 py-3">
 					<div class:opacity-40={noReminder}>
