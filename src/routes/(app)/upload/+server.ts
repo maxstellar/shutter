@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import { requireWhitelisted } from '$lib/server/auth/access';
 import { sniffMime, getDimensions } from '$lib/server/images';
 import { getUploader } from '$lib/server/cdn';
@@ -24,6 +25,8 @@ export const POST: RequestHandler = async (event) => {
 	const { width, height } = getDimensions(buffer);
 
 	const today = currentETDay();
+	if (env.COHORT_START && today < env.COHORT_START) error(403, 'Uploads have not opened yet');
+	if (env.COHORT_END && today > env.COHORT_END) error(403, 'Uploads are closed for this cohort');
 	assertUserDayEditable(today);
 
 	const userId = event.locals.user!.id;
@@ -74,6 +77,8 @@ export const DELETE: RequestHandler = async (event) => {
 	if (!photoId) error(400, 'Missing photo id');
 
 	const today = currentETDay();
+	if (env.COHORT_START && today < env.COHORT_START) error(403, 'Uploads have not opened yet');
+	if (env.COHORT_END && today > env.COHORT_END) error(403, 'Uploads are closed for this cohort');
 	assertUserDayEditable(today);
 
 	const userId = event.locals.user!.id;
