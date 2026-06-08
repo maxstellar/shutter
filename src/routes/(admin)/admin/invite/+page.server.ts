@@ -29,7 +29,7 @@ export const actions: Actions = {
 
 		const appUrl = env.ORIGIN ?? 'https://shutter.maxstellar.net';
 		const msg = [
-			`*You've been invited to Shutter, the shared photo album for Hack Club interns!*`,
+			`*You're invited to Shutter, the shared photo album for Hack Club interns!*`,
 			``,
 			`Post at least 3 photos every day to maintain a streak! Each day will have a prompt that at least one of your photos should match (ex: take a photo with another intern outside of work, at a place you've never been to).\n\nAt the end of the summer, if everyone keeps up their streaks, we'll have around 2000 photos to look back on and cherish!`,
 			``,
