@@ -4,6 +4,7 @@
 	import Nav from '$lib/components/Nav.svelte';
 	import PullToRefresh from '$lib/components/PullToRefresh.svelte';
 	import Onboarding from '$lib/components/Onboarding.svelte';
+	import MobileNudge from '$lib/components/MobileNudge.svelte';
 	import type { LayoutData } from './$types';
 	import { browser } from '$app/environment';
 
@@ -26,7 +27,8 @@
 	{#if data.isWhitelisted}
 		<PullToRefresh />
 		<Onboarding onboarded={data.user?.onboarded ?? false} />
-{/if}
+		<MobileNudge />
+	{/if}
 	<main class="flex-1 sm:pb-0" class:content-bottom-padding={data.isWhitelisted}>
 		{@render children()}
 	</main>
