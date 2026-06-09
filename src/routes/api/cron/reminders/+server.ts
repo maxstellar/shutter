@@ -31,6 +31,9 @@ export const POST: RequestHandler = async (event) => {
 	const today = currentETDay();
 	const hour = currentETHour();
 
+	if (env.COHORT_START && today < env.COHORT_START) return json({ sent: 0, hour, day: today, skipped: 'before_cohort' });
+	if (env.COHORT_END && today > env.COHORT_END) return json({ sent: 0, hour, day: today, skipped: 'after_cohort' });
+
 	const whitelistedIds = await getWhitelistedSlackIds();
 
 	// Get all users with this reminder hour who haven't yet had 3 photos today
