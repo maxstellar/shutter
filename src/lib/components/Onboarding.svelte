@@ -3,18 +3,28 @@
 	import { fade } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { beforeNavigate } from '$app/navigation';
+	import { enablePushSubscription } from '$lib/push';
 
-	let { onboarded = false }: { onboarded?: boolean } = $props();
+	let { onboarded = false, vapidPublicKey = '' }: { onboarded?: boolean; vapidPublicKey?: string } =
+		$props();
 
 	beforeNavigate(({ cancel }) => {
 		if (active) cancel();
 	});
 
 	const STORAGE_KEY = 'shutter_onboarded_v1';
+	const NOTIF_KEY = 'shutter_notif_prompted_v1';
 
-	async function markComplete() {
-		localStorage.setItem(STORAGE_KEY, '1');
-		await fetch('/api/onboarding/complete', { method: 'POST' });
+	async function markOnboardingComplete() {
+		if (!localStorage.getItem(STORAGE_KEY)) {
+			localStorage.setItem(STORAGE_KEY, '1');
+			await fetch('/api/onboarding/complete', { method: 'POST' });
+		}
+	}
+
+	function markNotifPrompted() {
+		localStorage.setItem(NOTIF_KEY, '1');
+		notifPrompted = true;
 	}
 
 	type Step = {
@@ -24,6 +34,7 @@
 		pad?: number;
 		noSpotlight?: boolean;
 		pwa?: boolean;
+		notifications?: boolean;
 	};
 
 	const steps: Step[] = [
@@ -63,6 +74,13 @@
 			body: '',
 			noSpotlight: true,
 			pwa: true
+		},
+		{
+			selector: 'body',
+			title: 'Get daily reminders 🔔',
+			body: "Turn on notifications so you don't miss today's prompt.",
+			noSpotlight: true,
+			notifications: true
 		}
 	];
 
@@ -85,10 +103,15 @@
 	let box = $state<{ x: number; y: number; w: number; h: number } | null>(null);
 	let isStandalone = $state(false);
 	let browser = $state<Browser>('other');
+	let notifPrompted = $state(true); // assume true until onMount confirms otherwise
+	let notifPermission = $state<NotificationPermission | 'unsupported'>('unsupported');
+	let notifLoading = $state(false);
+	let notifError = $state<string | null>(null);
+	let flowType = $state<'onboarding' | 'notif' | null>(null);
 
 	function updateBox() {
-		const step = steps[stepIndex];
-		if (step.noSpotlight) {
+		const step = visibleSteps[stepIndex];
+		if (!step || step.noSpotlight) {
 			box = null;
 			return;
 		}
@@ -104,29 +127,63 @@
 			window.matchMedia('(display-mode: standalone)').matches ||
 			(navigator as any).standalone === true;
 		browser = detectBrowser();
+		notifPrompted = !!localStorage.getItem(NOTIF_KEY);
+		notifPermission = 'Notification' in window ? Notification.permission : 'unsupported';
 
-		if (
-			$page.url.pathname === '/' &&
-			window.innerWidth < 640 &&
-			!onboarded &&
-			!localStorage.getItem(STORAGE_KEY)
-		) {
+		const canShowNotif =
+			isStandalone && !notifPrompted && notifPermission === 'default';
+
+		if ($page.url.pathname !== '/' || window.innerWidth >= 640) return;
+
+		if (!onboarded && !localStorage.getItem(STORAGE_KEY)) {
+			flowType = 'onboarding';
 			setTimeout(() => {
+				active = true;
+				updateBox();
+			}, 600);
+		} else if (canShowNotif) {
+			flowType = 'notif';
+			setTimeout(() => {
+				stepIndex = 0;
 				active = true;
 				updateBox();
 			}, 600);
 		}
 	});
 
-	let visibleSteps = $derived(isStandalone ? steps.filter((s) => !s.pwa) : steps);
+	let visibleSteps = $derived(
+		flowType === 'notif'
+			? steps.filter((s) => s.notifications)
+			: steps.filter((s) => {
+					if (s.pwa && isStandalone) return false;
+					if (s.notifications && (!isStandalone || notifPermission !== 'default')) return false;
+					return true;
+				})
+	);
 
 	$effect(() => {
 		if (active && visibleSteps[stepIndex]?.pwa) {
-			markComplete();
+			markOnboardingComplete();
 		}
 	});
 
+	async function handleEnableNotifications() {
+		notifLoading = true;
+		notifError = null;
+		const result = await enablePushSubscription(vapidPublicKey);
+		notifLoading = false;
+		markNotifPrompted();
+		if (!result.ok) {
+			notifError = result.error ?? 'Failed to enable notifications';
+			return;
+		}
+		next();
+	}
+
 	function next() {
+		const step = visibleSteps[stepIndex];
+		if (step?.notifications) markNotifPrompted();
+
 		if (stepIndex < visibleSteps.length - 1) {
 			stepIndex++;
 			updateBox();
@@ -137,7 +194,7 @@
 
 	function dismiss() {
 		active = false;
-		markComplete();
+		if (flowType === 'onboarding') markOnboardingComplete();
 	}
 
 	let tooltipEl = $state<HTMLDivElement | null>(null);
@@ -191,7 +248,22 @@
 				{visibleSteps[stepIndex].title}
 			</p>
 
-			{#if visibleSteps[stepIndex].pwa}
+			{#if visibleSteps[stepIndex].notifications}
+				<p class="mb-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+					{visibleSteps[stepIndex].body}
+				</p>
+				<button
+					onclick={handleEnableNotifications}
+					disabled={notifLoading}
+					class="mb-3 w-full cursor-pointer rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-all hover:brightness-110 active:brightness-100 disabled:cursor-not-allowed disabled:opacity-60"
+					style="background-color: var(--color-accent)"
+				>
+					{notifLoading ? 'Enabling…' : 'Enable notifications'}
+				</button>
+				{#if notifError}
+					<p class="mb-3 text-xs text-red-500">{notifError}</p>
+				{/if}
+			{:else if visibleSteps[stepIndex].pwa}
 				{@const shareIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>`}
 				{@const dotsIcon = `<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>`}
 				{@const linesIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`}
@@ -259,13 +331,22 @@
 							Back
 						</button>
 					{/if}
-					<button
-						onclick={next}
-						class="cursor-pointer rounded-lg px-3.5 py-1.5 text-xs font-medium text-white transition-all hover:brightness-110 active:brightness-100"
-						style="background-color: var(--color-accent)"
-					>
-						{stepIndex < visibleSteps.length - 1 ? 'Next' : 'Done'}
-					</button>
+					{#if visibleSteps[stepIndex].notifications}
+						<button
+							onclick={next}
+							class="cursor-pointer text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+						>
+							{stepIndex < visibleSteps.length - 1 ? 'Skip' : 'Not now'}
+						</button>
+					{:else}
+						<button
+							onclick={next}
+							class="cursor-pointer rounded-lg px-3.5 py-1.5 text-xs font-medium text-white transition-all hover:brightness-110 active:brightness-100"
+							style="background-color: var(--color-accent)"
+						>
+							{stepIndex < visibleSteps.length - 1 ? 'Next' : 'Done'}
+						</button>
+					{/if}
 				</div>
 			</div>
 		</div>

@@ -26,7 +26,7 @@
 	<Nav user={data.user} isAdmin={data.isAdmin} isWhitelisted={data.isWhitelisted} />
 	{#if data.isWhitelisted}
 		<PullToRefresh />
-		<Onboarding onboarded={data.user?.onboarded ?? false} />
+		<Onboarding onboarded={data.user?.onboarded ?? false} vapidPublicKey={data.vapidPublicKey} />
 		<MobileNudge />
 	{/if}
 	<main class="flex-1 sm:pb-0" class:content-bottom-padding={data.isWhitelisted}>

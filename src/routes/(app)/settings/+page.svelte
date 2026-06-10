@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
+	import { enablePushSubscription } from '$lib/push';
 
 	let { data }: { data: PageData } = $props();
 
@@ -38,41 +39,16 @@
 			('standalone' in navigator && (navigator as { standalone?: boolean }).standalone === true);
 	});
 
-	function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
-		const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-		const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-		const raw = atob(base64);
-		const arr = new Uint8Array(raw.length);
-		for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-		return arr.buffer;
-	}
-
 	async function enablePush() {
 		pushLoading = true;
 		pushError = null;
-		try {
-			const permission = await Notification.requestPermission();
-			if (permission !== 'granted') {
-				pushError = 'Notification permission denied.';
-				return;
-			}
-			const reg = await navigator.serviceWorker.ready;
-			const sub = await reg.pushManager.subscribe({
-				userVisibleOnly: true,
-				applicationServerKey: urlBase64ToUint8Array(data.vapidPublicKey)
-			});
-			const res = await fetch('/api/push/subscribe', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(sub.toJSON())
-			});
-			if (!res.ok) throw new Error('Subscription save failed');
+		const result = await enablePushSubscription(data.vapidPublicKey);
+		if (result.ok) {
 			pushEnabled = true;
-		} catch (e) {
-			pushError = e instanceof Error ? e.message : 'Failed to enable push';
-		} finally {
-			pushLoading = false;
+		} else {
+			pushError = result.error ?? 'Failed to enable push';
 		}
+		pushLoading = false;
 	}
 
 	async function disablePush() {

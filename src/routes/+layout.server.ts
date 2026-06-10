@@ -16,6 +16,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies }) => {
 		isWhitelisted: locals.isWhitelisted,
 		theme,
 		cohortStart: validDate(env.COHORT_START),
-		cohortEnd: validDate(env.COHORT_END)
+		cohortEnd: validDate(env.COHORT_END),
+		vapidPublicKey: env.VAPID_PUBLIC_KEY ?? ''
 	};
 };
