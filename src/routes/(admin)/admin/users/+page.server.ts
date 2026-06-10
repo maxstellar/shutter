@@ -1,10 +1,8 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { users, photos, push_subscriptions } from '$lib/server/db/schema';
-import { and, eq, isNull, sql } from 'drizzle-orm';
-import { currentETDay } from '$lib/server/time';
-import { computeStreaksForUsers } from '$lib/server/streak';
+import { users, push_subscriptions } from '$lib/server/db/schema';
+import { sql } from 'drizzle-orm';
 import { getWhitelistedSlackIds, requireAdmin } from '$lib/server/auth/access';
 import { sendSlackDM } from '$lib/server/slack';
 
@@ -28,27 +26,15 @@ ${signoff}`;
 }
 
 export const load: PageServerLoad = async () => {
-	const today = currentETDay();
-
-	const [allUsers, whitelistedIds] = await Promise.all([
+	const [allUsers, whitelistedIds, pushCounts] = await Promise.all([
 		db.select().from(users).orderBy(users.name),
-		getWhitelistedSlackIds()
-	]);
-	const whitelisted = allUsers.filter((u) => u.slack_id && whitelistedIds.has(u.slack_id));
-
-	const [todayCounts, pushCounts, streakMap] = await Promise.all([
-		db
-			.select({ user_id: photos.user_id, count: sql<number>`count(*)::int` })
-			.from(photos)
-			.where(and(eq(photos.day, today), isNull(photos.deleted_at)))
-			.groupBy(photos.user_id),
+		getWhitelistedSlackIds(),
 		db
 			.select({ user_id: push_subscriptions.user_id, count: sql<number>`count(*)::int` })
 			.from(push_subscriptions)
-			.groupBy(push_subscriptions.user_id),
-		computeStreaksForUsers(whitelisted.map((u) => u.id))
+			.groupBy(push_subscriptions.user_id)
 	]);
-	const countMap = new Map(todayCounts.map((r) => [r.user_id, r.count]));
+	const whitelisted = allUsers.filter((u) => u.slack_id && whitelistedIds.has(u.slack_id));
 	const pushMap = new Map(pushCounts.map((r) => [r.user_id, r.count]));
 
 	const members = whitelisted.map((u) => ({
@@ -56,19 +42,16 @@ export const load: PageServerLoad = async () => {
 		name: u.name,
 		email: u.email,
 		avatar_url: u.avatar_url,
-		todayCount: countMap.get(u.id) ?? 0,
-		streak: streakMap.get(u.id)?.current ?? 0,
+		created_at: u.created_at,
 		reminder_hour: u.reminder_hour_local,
 		slack_notify: u.slack_notify,
 		has_slack: !!u.slack_id,
 		push_count: pushMap.get(u.id) ?? 0
 	}));
 
-	members.sort((a, b) => b.streak - a.streak || a.name.localeCompare(b.name));
-
 	const reminderEligibleCount = members.filter((m) => m.has_slack && m.push_count === 0).length;
 
-	return { members, today, reminderEligibleCount };
+	return { members, reminderEligibleCount };
 };
 
 export const actions: Actions = {

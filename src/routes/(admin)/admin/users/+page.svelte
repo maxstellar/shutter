@@ -2,7 +2,6 @@
 	import type { PageData } from './$types';
 	import { enhance } from '$app/forms';
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
-	import StreakBadge from '$lib/components/StreakBadge.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -16,6 +15,12 @@
 		if (h < 12) return `${h} AM`;
 		if (h === 12) return '12 PM';
 		return `${h - 12} PM`;
+	}
+
+	function formatDate(d: Date | string | null): string {
+		if (!d) return '—';
+		const date = d instanceof Date ? d : new Date(d);
+		return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 </script>
 
@@ -94,8 +99,8 @@
 			<thead>
 				<tr class="border-b border-zinc-300 text-left dark:border-zinc-800">
 					<th class="px-4 py-2.5 font-medium text-zinc-500">Member</th>
-					<th class="px-4 py-2.5 font-medium text-zinc-500">Today</th>
-					<th class="px-4 py-2.5 font-medium text-zinc-500">Streak</th>
+					<th class="px-4 py-2.5 font-medium text-zinc-500">Email</th>
+					<th class="px-4 py-2.5 font-medium text-zinc-500">Joined</th>
 					<th class="px-4 py-2.5 font-medium text-zinc-500">Notifications</th>
 				</tr>
 			</thead>
@@ -105,17 +110,14 @@
 						<td class="px-4 py-3">
 							<div class="flex items-center gap-2">
 								<UserAvatar name={member.name} avatarUrl={member.avatar_url} size={24} />
-								<div>
-									<p class="font-medium text-zinc-800 dark:text-zinc-200">{member.name}</p>
-									<p class="text-xs text-zinc-400">{member.email}</p>
-								</div>
+								<p class="font-medium text-zinc-800 dark:text-zinc-200">{member.name}</p>
 							</div>
 						</td>
-						<td class="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-							{member.todayCount}/5
+						<td class="px-4 py-3 text-xs text-zinc-500 dark:text-zinc-400">
+							{member.email}
 						</td>
-						<td class="px-4 py-3">
-							<StreakBadge streak={member.streak} />
+						<td class="px-4 py-3 text-xs text-zinc-500 dark:text-zinc-400">
+							{formatDate(member.created_at)}
 						</td>
 						<td class="px-4 py-3">
 							<div class="space-y-1">
