@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
-import { requireAdmin } from '$lib/server/auth/access';
+import { requireAdmin, invalidateWhitelistCache } from '$lib/server/auth/access';
 import { db } from '$lib/server/db';
 import { whitelist, audit_log } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -26,6 +26,7 @@ export const actions: Actions = {
 			.insert(whitelist)
 			.values({ slack_id: slackId, invited_by_user_id: event.locals.user!.id })
 			.onConflictDoNothing();
+		invalidateWhitelistCache();
 
 		const appUrl = env.ORIGIN ?? 'https://shutter.maxstellar.net';
 		const msg = [
@@ -55,6 +56,7 @@ export const actions: Actions = {
 		if (!slackId) return fail(400, { error: 'slack_id required' });
 
 		await db.delete(whitelist).where(eq(whitelist.slack_id, slackId));
+		invalidateWhitelistCache();
 
 		await db.insert(audit_log).values({
 			actor_user_id: event.locals.user!.id,

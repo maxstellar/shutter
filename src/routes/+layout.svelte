@@ -5,6 +5,7 @@
 	import PullToRefresh from '$lib/components/PullToRefresh.svelte';
 	import Onboarding from '$lib/components/Onboarding.svelte';
 	import MobileNudge from '$lib/components/MobileNudge.svelte';
+	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 	import type { LayoutData } from './$types';
 	import { browser } from '$app/environment';
 
@@ -21,6 +22,8 @@
 	<link rel="icon" href={favicon} />
 	<title>Shutter</title>
 </svelte:head>
+
+<NavigationProgress />
 
 <div class="flex min-h-dvh flex-col">
 	<Nav user={data.user} isAdmin={data.isAdmin} isWhitelisted={data.isWhitelisted} />
