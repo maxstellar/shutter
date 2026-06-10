@@ -20,7 +20,7 @@
 					// asymptote toward 0.85 so the bar always looks like it's moving
 					progress = progress + (0.85 - progress) * 0.12;
 				}, 120);
-			}, 500);
+			}, 250);
 		} else {
 			clearTimeout(showTimer);
 			clearInterval(tick);

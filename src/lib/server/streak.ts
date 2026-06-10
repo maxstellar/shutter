@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { photos, prompt_completions } from '$lib/server/db/schema';
-import { and, eq, isNull, lt } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { currentETDay } from './time';
 
@@ -9,84 +9,40 @@ export interface StreakInfo {
 	longest: number;
 }
 
-// A day is "complete" if:
-//   - user has >= 3 non-deleted photos
-//   - AND prompt_met is NOT 0 (null = not yet reviewed = benefit of the doubt, 1 = approved)
-// A day is "broken" if prompt_met = 0 (admin explicitly rejected)
-// Today never breaks the streak even if incomplete, but counts toward it if >= 3 photos.
-export async function computeStreak(userId: string): Promise<StreakInfo> {
-	const today = currentETDay();
+function ymdMinusOne(day: string): string {
+	const d = new Date(day + 'T12:00:00Z');
+	d.setUTCDate(d.getUTCDate() - 1);
+	return d.toISOString().slice(0, 10);
+}
 
-	// Fetch up to 365 past days of photo counts (excluding today)
-	const photoCounts = await db
-		.select({
-			day: photos.day,
-			count: sql<number>`count(*)::int`
-		})
-		.from(photos)
-		.where(
-			and(
-				eq(photos.user_id, userId),
-				isNull(photos.deleted_at),
-				lt(photos.day, today)
-			)
-		)
-		.groupBy(photos.day)
-		.orderBy(sql`${photos.day} desc`)
-		.limit(365);
-
-	// Fetch prompt completions for those same days
-	const completions = await db
-		.select({ day: prompt_completions.day, prompt_met: prompt_completions.prompt_met })
-		.from(prompt_completions)
-		.where(
-			and(
-				eq(prompt_completions.user_id, userId),
-				lt(prompt_completions.day, today)
-			)
-		);
-
-	const completionMap = new Map(completions.map((c) => [c.day, c.prompt_met]));
-
-	// Walk consecutive days back from yesterday
+function walkStreak(
+	today: string,
+	photoCounts: Map<string, number>,
+	completions: Map<string, number>
+): StreakInfo {
 	let streak = 0;
 	let longest = 0;
 	let rejectedDay = false;
-	let expectedDate = new Date(today);
-	expectedDate.setDate(expectedDate.getDate() - 1);
 
-	for (const row of photoCounts) {
-		const rowDate = new Date(row.day!);
-		// Gap in days — streak broken
-		if (rowDate.getTime() !== expectedDate.getTime()) break;
-
-		const met = completionMap.get(row.day!);
-		// prompt_met = 0 means admin explicitly rejected → breaks streak
-		if (met === 0) { rejectedDay = true; break; }
-		if (row.count < 3) break;
-
+	let cursor = ymdMinusOne(today);
+	while (true) {
+		const count = photoCounts.get(cursor) ?? 0;
+		if (count === 0) break;
+		const met = completions.get(cursor);
+		if (met === 0) {
+			rejectedDay = true;
+			break;
+		}
+		if (count < 3) break;
 		streak++;
 		longest = Math.max(longest, streak);
-		expectedDate.setDate(expectedDate.getDate() - 1);
+		cursor = ymdMinusOne(cursor);
 	}
 
-	// Today contributes to current streak if >= 3 photos and not explicitly rejected
-	const [todayPhotos] = await db
-		.select({ count: sql<number>`count(*)::int` })
-		.from(photos)
-		.where(and(eq(photos.user_id, userId), isNull(photos.deleted_at), eq(photos.day, today)));
-
-	const [todayCompletion] = await db
-		.select({ prompt_met: prompt_completions.prompt_met })
-		.from(prompt_completions)
-		.where(and(eq(prompt_completions.user_id, userId), eq(prompt_completions.day, today)))
-		.limit(1);
-
-	const todayCount = todayPhotos?.count ?? 0;
-	const todayMet = todayCompletion?.prompt_met;
+	const todayCount = photoCounts.get(today) ?? 0;
+	const todayMet = completions.get(today);
 
 	if (todayMet === 0) {
-		// Today explicitly rejected — current streak resets to 0
 		streak = 0;
 	} else if (!rejectedDay && todayCount >= 3) {
 		streak++;
@@ -94,4 +50,70 @@ export async function computeStreak(userId: string): Promise<StreakInfo> {
 	}
 
 	return { current: streak, longest };
+}
+
+// A day is "complete" if:
+//   - user has >= 3 non-deleted photos
+//   - AND prompt_met is NOT 0 (null = not yet reviewed = benefit of the doubt, 1 = approved)
+// A day is "broken" if prompt_met = 0 (admin explicitly rejected)
+// Today never breaks the streak even if incomplete, but counts toward it if >= 3 photos.
+export async function computeStreaksForUsers(
+	userIds: string[]
+): Promise<Map<string, StreakInfo>> {
+	const result = new Map<string, StreakInfo>();
+	if (userIds.length === 0) return result;
+
+	const today = currentETDay();
+
+	const [photoRows, completionRows] = await Promise.all([
+		db
+			.select({
+				user_id: photos.user_id,
+				day: photos.day,
+				count: sql<number>`count(*)::int`
+			})
+			.from(photos)
+			.where(and(inArray(photos.user_id, userIds), isNull(photos.deleted_at)))
+			.groupBy(photos.user_id, photos.day),
+		db
+			.select({
+				user_id: prompt_completions.user_id,
+				day: prompt_completions.day,
+				prompt_met: prompt_completions.prompt_met
+			})
+			.from(prompt_completions)
+			.where(inArray(prompt_completions.user_id, userIds))
+	]);
+
+	const photosByUser = new Map<string, Map<string, number>>();
+	for (const row of photoRows) {
+		let m = photosByUser.get(row.user_id);
+		if (!m) photosByUser.set(row.user_id, (m = new Map()));
+		m.set(row.day!, row.count);
+	}
+
+	const completionsByUser = new Map<string, Map<string, number>>();
+	for (const row of completionRows) {
+		let m = completionsByUser.get(row.user_id);
+		if (!m) completionsByUser.set(row.user_id, (m = new Map()));
+		m.set(row.day!, row.prompt_met);
+	}
+
+	for (const userId of userIds) {
+		result.set(
+			userId,
+			walkStreak(
+				today,
+				photosByUser.get(userId) ?? new Map(),
+				completionsByUser.get(userId) ?? new Map()
+			)
+		);
+	}
+
+	return result;
+}
+
+export async function computeStreak(userId: string): Promise<StreakInfo> {
+	const map = await computeStreaksForUsers([userId]);
+	return map.get(userId) ?? { current: 0, longest: 0 };
 }
