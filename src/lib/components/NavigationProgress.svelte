@@ -20,7 +20,7 @@
 					// asymptote toward 0.85 so the bar always looks like it's moving
 					progress = progress + (0.85 - progress) * 0.12;
 				}, 120);
-			}, 150);
+			}, 500);
 		} else {
 			clearTimeout(showTimer);
 			clearInterval(tick);
@@ -37,7 +37,7 @@
 
 {#if visible}
 	<div
-		class="pointer-events-none fixed inset-x-0 top-0 z-[100] h-0.5 origin-left"
+		class="pointer-events-none fixed inset-x-0 top-0 z-100 h-0.5 origin-left"
 		style="background-color: var(--color-accent); transform: scaleX({progress}); transition: transform 200ms ease-out, opacity 200ms ease-out; opacity: {progress >= 1 ? 0 : 1};"
 	></div>
 {/if}
