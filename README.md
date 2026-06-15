@@ -86,7 +86,7 @@ To deploy: set the env vars from the table above, run `node migrate.js` once to 
 
 ## Using Shutter for other cohorts
 
-The "cohort" concept is generic - anyone with a defined start/end window can use this - think a group trip, or a class throughout a year, or even just a friend group through a special month.
+The "cohort" concept is generic - anyone with a defined start/end window can use this - think a Hack Club event, or a group trip, or even a class going through their school year together.
 
 **Configuring your cohort**
 
@@ -95,6 +95,18 @@ The "cohort" concept is generic - anyone with a defined start/end window can use
 - The 5-upload daily cap is in the upload route (`src/routes/(app)/upload/+server.ts`).
 
 The app mentions "Hack Club" and "interns" by default - find instances and replace them as as needed.
+
+**Slack bot**
+
+The bot needs 5 scopes:
+
+- **chat:write** - Send DM notifications and forward images to Slack if wanted
+- **users:read** - Fetch user data for profile pictures and more
+- **chat:write.public** - Forward images to public Slack channels the bot isn't in
+- **channels:read** - Get channel info to confirm the bot can access it / post in it
+- **groups:read** - Post in private channels the bot is invited to
+
+Set up a Shutter bot (maybe themed around your specific cohort?) with these scopes, and you're golden!
 
 # Contributing
 
