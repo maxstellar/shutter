@@ -4,6 +4,20 @@ A daily photo journal for Hack Club intern cohorts (could potentially be repurpo
 
 Built with SvelteKit, PostgreSQL (Drizzle ORM), and Hack Club OAuth.
 
+## Features
+
+**For members**
+
+- Daily photo prompts, up to 5 uploads per day
+- Streak tracking (3+ photos/day and the prompt met keeps your streak alive)
+- Like other people's photos to promote the best ones to the top
+- Streaks leaderboard
+- Per-user notification preferences:
+  - Daily reminder at a configurable hour
+  - Web push notifications (when installed as a PWA)
+  - Slack DM reminders
+- Cohort gating: uploads + reminders are paused outside the configured `COHORT_START` / `COHORT_END` window
+
 ## Dev Setup
 
 **1. Install dependencies**
@@ -55,6 +69,35 @@ npm run db:studio   # Drizzle Studio (visual DB browser)
 npm run db:generate # generate migrations from schema changes
 ```
 
+## Self-hosting
+
+Shutter is a regular SvelteKit app, so it runs on anything that can host one. You'll need:
+
+- **Postgres**
+- **A Hack Club Auth app**
+- **Hack Club CDN app** — for image hosting (understand that this means your photos will be somewhat public?)
+- **A way to run a cron job** — `hooks.server.ts` schedules an in-process hourly tick via [`croner`](https://github.com/Hexagon/croner), which hits `/api/cron/reminders`. If your host kills idle processes (most serverless platforms), point a real cron service (Vercel Cron, GitHub Actions on a schedule, etc.) at `/api/cron/reminders` with the `CRON_SECRET` bearer token instead.
+
+Optionally:
+
+- **Slack workspace + bot token** — only needed if you want DM reminders, the welcome DM on invite, or the admin "broadcast to non-push users" feature
+
+To deploy: set the env vars from the table above, run `node migrate.js` once to apply migrations, then `node build/index.js` (or whatever your platform's start command is).
+
+## Using Shutter for other cohorts
+
+The "cohort" concept is generic - anyone with a defined start/end window can use this - think a group trip, or a class throughout a year, or even just a friend group through a special month.
+
+**Configuring your cohort**
+
+- `COHORT_START` / `COHORT_END` controls when images can be submitted.
+- The 3-photos-per-day streak threshold lives in `src/lib/server/streak.ts`.
+- The 5-upload daily cap is in the upload route (`src/routes/(app)/upload/+server.ts`).
+
+The app mentions "Hack Club" and "interns" by default - find instances and replace them as as needed.
+
 # Contributing
 
 PRs welcome!
+
+If you have any further questions about how to host your own instance of Shutter for a group or cohort, feel free to reach out to me on Slack @maxstellar or at my email!
