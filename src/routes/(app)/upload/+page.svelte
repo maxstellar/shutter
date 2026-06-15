@@ -19,16 +19,32 @@
 	let error = $state<string | null>(null);
 	let fileInput = $state<HTMLInputElement | null>(null);
 
+	// Slack crosspost: per-upload, default off
+	let crosspost = $state(false);
+	let channelLink = $derived(
+		data.crosspostChannelId
+			? `https://slack.com/app_redirect?channel=${data.crosspostChannelId}`
+			: '#'
+	);
+
+	let toast = $state<{ msg: string; error: boolean } | null>(null);
+	let toastTimer: ReturnType<typeof setTimeout> | undefined;
+	function showToast(msg: string, isError = false) {
+		if (toastTimer) clearTimeout(toastTimer);
+		toast = { msg, error: isError };
+		toastTimer = setTimeout(() => (toast = null), 5000);
+	}
+
 	// Remaining slots
 	let remaining = $derived(5 - data.photos.length);
 	let canUpload = $derived(remaining > 0);
 
 	let outsideCohort = $derived(
 		(!!data.cohortStart && data.today < data.cohortStart) ||
-		(!!data.cohortEnd && data.today > data.cohortEnd)
+			(!!data.cohortEnd && data.today > data.cohortEnd)
 	);
 
-	async function stripExifAndUpload(file: File): Promise<void> {
+	async function stripExifAndUpload(file: File): Promise<{ id: string; cdn_url: string }> {
 		// Re-encode via canvas to strip EXIF (including GPS data)
 		const bitmap = await createImageBitmap(file);
 		const canvas = document.createElement('canvas');
@@ -54,6 +70,27 @@
 			const body = await res.json().catch(() => ({ message: res.statusText }));
 			throw new Error(body.message ?? 'Upload failed');
 		}
+		return await res.json();
+	}
+
+	async function crosspostBatch(photoIds: string[]) {
+		try {
+			const res = await fetch('/upload/crosspost', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ photoIds })
+			});
+			const body = await res.json().catch(() => ({ ok: false }));
+			if (!res.ok || !body.ok) {
+				showToast(body.error ?? "Couldn't send your photos to Slack.", true);
+			} else {
+				showToast(
+					`Sent ${photoIds.length} photo${photoIds.length !== 1 ? 's' : ''} to #${data.crosspostChannelName ?? 'Slack'}`
+				);
+			}
+		} catch {
+			showToast("Couldn't reach Slack. Please try again.", true);
+		}
 	}
 
 	async function handleFiles(files: FileList | null) {
@@ -66,9 +103,10 @@
 			return;
 		}
 		uploading = true;
+		const uploaded: { id: string }[] = [];
 		try {
 			for (const file of selected) {
-				await stripExifAndUpload(file);
+				uploaded.push(await stripExifAndUpload(file));
 			}
 			await invalidateAll();
 		} catch (e) {
@@ -76,6 +114,11 @@
 		} finally {
 			uploading = false;
 			if (fileInput) fileInput.value = '';
+		}
+
+		// Crosspost whatever made it into the album, as a single message (best-effort).
+		if (crosspost && data.crosspostChannelId && uploaded.length > 0) {
+			await crosspostBatch(uploaded.map((p) => p.id));
 		}
 	}
 
@@ -103,13 +146,33 @@
 </svelte:head>
 
 <div class="page-container">
-	<h1 class="page-heading mb-4.5">
-		Upload
-	</h1>
+	<h1 class="page-heading mb-4.5">Upload</h1>
 
 	{#if outsideCohort}
 		<div class="flex flex-col items-center gap-4 py-16 text-center">
-			<svg fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414" xmlns="http://www.w3.org/2000/svg" aria-label="sun" viewBox="0 0 32 32" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="96" height="96" style="color:var(--color-accent)"><path d="M15.001 5C15.001 4.448 15.449 4 16.001 4C16.553 4 17.001 4.448 17.001 5V7C17.001 7.552 16.553 8 16.001 8C15.449 8 15.001 7.552 15.001 7V5ZM9.12203 7.707C8.73203 7.317 8.09903 7.317 7.70803 7.707C7.31803 8.098 7.31803 8.731 7.70803 9.121L9.12203 10.536C9.51303 10.926 10.146 10.926 10.537 10.536C10.927 10.145 10.927 9.512 10.537 9.121L9.12203 7.707ZM24.536 7.707C24.146 7.317 23.513 7.317 23.122 7.707L21.708 9.121C21.318 9.512 21.318 10.145 21.708 10.536C22.099 10.926 22.732 10.926 23.122 10.536L24.537 9.121C24.927 8.731 24.926 8.098 24.536 7.707Z"/><path d="M20.001 16.176C20.001 13.815 18.156 12 16.001 12C13.846 12 12.001 13.815 12.001 16.176H10.001C10.001 12.765 12.687 10 16.001 10C19.315 10 22.001 12.765 22.001 16.176H20.001Z"/><path d="M15.001 27.1694C15.001 27.7214 15.449 28.1694 16.001 28.1694C16.553 28.1694 17.001 27.7214 17.001 27.1694V25.1694C17.001 24.6174 16.553 24.1694 16.001 24.1694C15.449 24.1694 15.001 24.6174 15.001 25.1694V27.1694ZM9.122 24.4624C8.732 24.8524 8.099 24.8524 7.708 24.4624C7.318 24.0714 7.318 23.4384 7.708 23.0484L9.122 21.6334C9.513 21.2434 10.146 21.2434 10.537 21.6334C10.927 22.0244 10.927 22.6574 10.537 23.0484L9.122 24.4624ZM24.536 24.4624C24.146 24.8524 23.513 24.8524 23.122 24.4624L21.708 23.0484C21.318 22.6574 21.318 22.0244 21.708 21.6334C22.099 21.2434 22.732 21.2434 23.122 21.6334L24.537 23.0484C24.927 23.4384 24.926 24.0714 24.536 24.4624ZM27 17.1694C27.552 17.1694 28 16.7214 28 16.1694C28 15.6174 27.552 15.1694 27 15.1694H25C24.448 15.1694 24 15.6174 24 16.1694C24 16.7214 24.448 17.1694 25 17.1694H27ZM8 16.1694C8 16.7214 7.552 17.1694 7 17.1694H5C4.448 17.1694 4 16.7214 4 16.1694C4 15.6174 4.448 15.1694 5 15.1694H7C7.552 15.1694 8 15.6174 8 16.1694Z"/><path d="M20.001 16.1741C20.001 18.5351 18.156 20.3501 16.001 20.3501C13.846 20.3501 12.001 18.5351 12.001 16.1741H10.001C10.001 19.5851 12.687 22.3501 16.001 22.3501C19.315 22.3501 22.001 19.5851 22.001 16.1741H20.001Z"/></svg>
+			<svg
+				fill-rule="evenodd"
+				clip-rule="evenodd"
+				stroke-linejoin="round"
+				stroke-miterlimit="1.414"
+				xmlns="http://www.w3.org/2000/svg"
+				aria-label="sun"
+				viewBox="0 0 32 32"
+				preserveAspectRatio="xMidYMid meet"
+				fill="currentColor"
+				width="96"
+				height="96"
+				style="color:var(--color-accent)"
+				><path
+					d="M15.001 5C15.001 4.448 15.449 4 16.001 4C16.553 4 17.001 4.448 17.001 5V7C17.001 7.552 16.553 8 16.001 8C15.449 8 15.001 7.552 15.001 7V5ZM9.12203 7.707C8.73203 7.317 8.09903 7.317 7.70803 7.707C7.31803 8.098 7.31803 8.731 7.70803 9.121L9.12203 10.536C9.51303 10.926 10.146 10.926 10.537 10.536C10.927 10.145 10.927 9.512 10.537 9.121L9.12203 7.707ZM24.536 7.707C24.146 7.317 23.513 7.317 23.122 7.707L21.708 9.121C21.318 9.512 21.318 10.145 21.708 10.536C22.099 10.926 22.732 10.926 23.122 10.536L24.537 9.121C24.927 8.731 24.926 8.098 24.536 7.707Z"
+				/><path
+					d="M20.001 16.176C20.001 13.815 18.156 12 16.001 12C13.846 12 12.001 13.815 12.001 16.176H10.001C10.001 12.765 12.687 10 16.001 10C19.315 10 22.001 12.765 22.001 16.176H20.001Z"
+				/><path
+					d="M15.001 27.1694C15.001 27.7214 15.449 28.1694 16.001 28.1694C16.553 28.1694 17.001 27.7214 17.001 27.1694V25.1694C17.001 24.6174 16.553 24.1694 16.001 24.1694C15.449 24.1694 15.001 24.6174 15.001 25.1694V27.1694ZM9.122 24.4624C8.732 24.8524 8.099 24.8524 7.708 24.4624C7.318 24.0714 7.318 23.4384 7.708 23.0484L9.122 21.6334C9.513 21.2434 10.146 21.2434 10.537 21.6334C10.927 22.0244 10.927 22.6574 10.537 23.0484L9.122 24.4624ZM24.536 24.4624C24.146 24.8524 23.513 24.8524 23.122 24.4624L21.708 23.0484C21.318 22.6574 21.318 22.0244 21.708 21.6334C22.099 21.2434 22.732 21.2434 23.122 21.6334L24.537 23.0484C24.927 23.4384 24.926 24.0714 24.536 24.4624ZM27 17.1694C27.552 17.1694 28 16.7214 28 16.1694C28 15.6174 27.552 15.1694 27 15.1694H25C24.448 15.1694 24 15.6174 24 16.1694C24 16.7214 24.448 17.1694 25 17.1694H27ZM8 16.1694C8 16.7214 7.552 17.1694 7 17.1694H5C4.448 17.1694 4 16.7214 4 16.1694C4 15.6174 4.448 15.1694 5 15.1694H7C7.552 15.1694 8 15.6174 8 16.1694Z"
+				/><path
+					d="M20.001 16.1741C20.001 18.5351 18.156 20.3501 16.001 20.3501C13.846 20.3501 12.001 18.5351 12.001 16.1741H10.001C10.001 19.5851 12.687 22.3501 16.001 22.3501C19.315 22.3501 22.001 19.5851 22.001 16.1741H20.001Z"
+				/></svg
+			>
 			<p class="text-2xl font-semibold text-zinc-700 dark:text-zinc-300">
 				Summertime hasn't started yet! Come back when it's sunnier :)
 			</p>
@@ -119,8 +182,8 @@
 			Add up to 5 photos to the album! You need at least 3 to keep your streak.
 			<br /><br />
 			<strong
-				>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure you
-				get consent from your subjects.</strong
+				>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure
+				you get consent from your subjects.</strong
 			>
 		</p>
 		{#if data.prompt}
@@ -134,6 +197,42 @@
 				{error}
 			</p>
 		{/if}
+
+		<!-- Crosspost to Slack -->
+		<div class="mb-4 flex items-center gap-2 text-sm">
+			{#if data.crosspostChannelId}
+				<input
+					id="crosspost"
+					type="checkbox"
+					bind:checked={crosspost}
+					class="h-4 w-4 cursor-pointer rounded border-zinc-300 dark:border-zinc-600"
+					style="accent-color: var(--color-accent)"
+				/>
+				<label for="crosspost" class="cursor-pointer text-zinc-600 dark:text-zinc-400">
+					Also send to Slack channel?
+					<a
+						href={channelLink}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="font-medium hover:underline"
+						style="color: var(--color-accent)"
+						onclick={(e) => e.stopPropagation()}
+					>
+						#{data.crosspostChannelName ?? 'channel'}
+					</a>
+				</label>
+			{:else}
+				<span class="text-zinc-500">
+					Also send to Slack channel?
+					<a
+						href="/settings"
+						class="font-medium underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+					>
+						set one now
+					</a>
+				</span>
+			{/if}
+		</div>
 
 		<!-- Photo grid: 5 slots -->
 		<div class="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -178,7 +277,8 @@
 					aria-label="Add photo"
 				>
 					{#if uploading}
-						<span class="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600"
+						<span
+							class="h-4 w-4 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600"
 						></span>
 					{:else}
 						<svg
@@ -223,3 +323,13 @@
 		{/if}
 	{/if}
 </div>
+
+{#if toast}
+	<div
+		class="fixed bottom-24 left-1/2 max-w-[90vw] -translate-x-1/2 rounded-md px-4 py-2 text-sm shadow-lg sm:bottom-6 {toast.error
+			? 'bg-red-600 text-white'
+			: 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'}"
+	>
+		{toast.msg}
+	</div>
+{/if}

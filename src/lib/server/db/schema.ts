@@ -24,6 +24,8 @@ export const users = pgTable(
 		hackclub_id: text('hackclub_id').notNull().unique(),
 		slack_id: text('slack_id'),
 		slack_notify: boolean('slack_notify').notNull().default(true),
+		slack_crosspost_channel_id: text('slack_crosspost_channel_id'),
+		slack_crosspost_channel_name: text('slack_crosspost_channel_name'),
 		name: text('name').notNull(),
 		email: text('email').notNull(),
 		avatar_url: text('avatar_url'),
@@ -59,9 +61,7 @@ export const photos = pgTable(
 			.references(() => users.id, { onDelete: 'cascade' }),
 		created_at: tsz('created_at').notNull().defaultNow(),
 		// Computed from created_at in America/New_York; Postgres 12+ stored generated column
-		day: date('day').generatedAlwaysAs(
-			sql`((created_at AT TIME ZONE 'America/New_York')::date)`
-		),
+		day: date('day').generatedAlwaysAs(sql`((created_at AT TIME ZONE 'America/New_York')::date)`),
 		cdn_url: text('cdn_url').notNull(),
 		cdn_key: text('cdn_key'),
 		mime_type: text('mime_type').notNull(),
@@ -132,8 +132,12 @@ export const reminder_sends = pgTable(
 export const photo_likes = pgTable(
 	'photo_likes',
 	{
-		photo_id: uuid('photo_id').notNull().references(() => photos.id, { onDelete: 'cascade' }),
-		user_id: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+		photo_id: uuid('photo_id')
+			.notNull()
+			.references(() => photos.id, { onDelete: 'cascade' }),
+		user_id: uuid('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
 		created_at: tsz('created_at').notNull().defaultNow()
 	},
 	(t) => [
@@ -154,7 +158,9 @@ export const audit_log = pgTable('audit_log', {
 
 export const whitelist = pgTable('whitelist', {
 	slack_id: text('slack_id').primaryKey(),
-	invited_by_user_id: uuid('invited_by_user_id').references(() => users.id, { onDelete: 'set null' }),
+	invited_by_user_id: uuid('invited_by_user_id').references(() => users.id, {
+		onDelete: 'set null'
+	}),
 	invited_at: tsz('invited_at').notNull().defaultNow()
 });
 

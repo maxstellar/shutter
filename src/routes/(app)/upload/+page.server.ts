@@ -11,17 +11,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 		db
 			.select()
 			.from(photos)
-			.where(and(eq(photos.user_id, locals.user!.id), eq(photos.day, today), isNull(photos.deleted_at)))
+			.where(
+				and(eq(photos.user_id, locals.user!.id), eq(photos.day, today), isNull(photos.deleted_at))
+			)
 			.orderBy(photos.created_at),
 		db.select().from(daily_prompts).where(eq(daily_prompts.day, today)).limit(1),
 		db
 			.select()
 			.from(prompt_completions)
 			.where(
-				and(
-					eq(prompt_completions.user_id, locals.user!.id),
-					eq(prompt_completions.day, today)
-				)
+				and(eq(prompt_completions.user_id, locals.user!.id), eq(prompt_completions.day, today))
 			)
 			.limit(1)
 	]);
@@ -30,6 +29,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		today,
 		photos: myPhotos,
 		prompt: todayPrompt[0] ?? null,
-		completion: myCompletion[0] ?? null
+		completion: myCompletion[0] ?? null,
+		crosspostChannelId: locals.user!.slack_crosspost_channel_id,
+		crosspostChannelName: locals.user!.slack_crosspost_channel_name
 	};
 };

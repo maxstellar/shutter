@@ -22,6 +22,32 @@
 		}, 2500);
 	}
 
+	// Slack crosspost channel input (seeded from saved value, refreshes on save)
+	let channelInput = $state(data.crosspostChannelId ?? '');
+	$effect(() => {
+		channelInput = data.crosspostChannelId ?? '';
+	});
+	let crosspostMsg = $state<string | null>(null);
+	let crosspostOk = $state(false);
+
+	function applyCrosspostResult(result: { type: string; data?: Record<string, unknown> }) {
+		const payload = (result.data?.crosspost ?? null) as {
+			ok: boolean;
+			error?: string;
+			name?: string | null;
+			cleared?: boolean;
+		} | null;
+		if (!payload) return;
+		crosspostOk = payload.ok;
+		if (!payload.ok) {
+			crosspostMsg = payload.error ?? "Couldn't save channel.";
+		} else if (payload.cleared) {
+			crosspostMsg = 'Crosspost channel removed.';
+		} else {
+			crosspostMsg = payload.name ? `Crossposting to #${payload.name}.` : 'Channel saved.';
+		}
+	}
+
 	let pushSupported = $state(false);
 	let pushEnabled = $state(false);
 	let isPWA = $state(false);
@@ -79,14 +105,14 @@
 </svelte:head>
 
 <div class="page-container">
-	<h1 class="page-heading mb-6">
-		Settings
-	</h1>
+	<h1 class="page-heading mb-6">Settings</h1>
 
 	<!-- Reminder time -->
 	<section class="mb-8">
 		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Daily reminder</h2>
-		<div class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
+		<div
+			class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]"
+		>
 			<form
 				method="POST"
 				action="?/saveReminder"
@@ -176,10 +202,84 @@
 		{/if}
 	</section>
 
+	<!-- Slack crosspost channel -->
+	<section class="mb-8">
+		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Slack crosspost</h2>
+		<div
+			class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]"
+		>
+			<p class="mb-3 text-xs text-zinc-500">
+				Pick a channel you can optionally crosspost photos to when uploading. Paste a channel link
+				or an ID like <code class="rounded bg-zinc-200 px-1 dark:bg-zinc-800">C0123ABC456</code>.
+				The Shutter bot must be a member of the channel.
+			</p>
+			{#if data.crosspostChannelName}
+				<p class="mb-2 text-sm text-zinc-700 dark:text-zinc-300">
+					Currently set to <span class="font-medium">#{data.crosspostChannelName}</span>
+				</p>
+			{/if}
+			<form
+				method="POST"
+				action="?/saveCrosspostChannel"
+				use:enhance={() =>
+					async ({ result, update }) => {
+						await update({ reset: false });
+						applyCrosspostResult(result);
+					}}
+				class="flex items-center gap-2"
+			>
+				<input
+					name="channel"
+					type="text"
+					bind:value={channelInput}
+					placeholder="Channel link or ID"
+					autocomplete="off"
+					spellcheck="false"
+					class="min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-900 focus:ring-2 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+				/>
+				<button
+					type="submit"
+					class="cursor-pointer rounded-md border border-zinc-300 px-3 py-1.5 text-sm transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+				>
+					Save
+				</button>
+			</form>
+			{#if data.crosspostChannelId}
+				<form
+					method="POST"
+					action="?/saveCrosspostChannel"
+					use:enhance={() =>
+						async ({ result, update }) => {
+							await update({ reset: false });
+							applyCrosspostResult(result);
+						}}
+					class="mt-2"
+				>
+					<input type="hidden" name="channel" value="" />
+					<button
+						type="submit"
+						class="cursor-pointer text-xs text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:hover:text-zinc-300"
+					>
+						Remove channel
+					</button>
+				</form>
+			{/if}
+			{#if crosspostMsg}
+				<p
+					class="mt-2 text-xs {crosspostOk ? 'text-green-600 dark:text-green-400' : 'text-red-500'}"
+				>
+					{crosspostMsg}
+				</p>
+			{/if}
+		</div>
+	</section>
+
 	<!-- Sign out -->
 	<section>
 		<h2 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Account</h2>
-		<div class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]">
+		<div
+			class="rounded-md border border-zinc-300 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-[#131315]"
+		>
 			<p class="mb-3 text-xs text-zinc-500">
 				Photos submitted to Shutter are stored on the Hack Club CDN and cannot be automatically
 				deleted once uploaded. Contact an admin if you need a photo removed.
