@@ -108,8 +108,12 @@ The bot needs 5 scopes:
 
 Set up a Shutter bot (maybe themed around your specific cohort?) with these scopes, and you're golden!
 
-# Contributing
+## Contributing
 
 PRs welcome!
+
+## Disclosure of AI Use
+
+This project used Claude Code for the implementation of various features, writing a good chunk of the code. Most technical workings were designed by me (including the login/auth system, the onboarding flow, integration with CDN and Slack, and more), but not manually implemented with hand-written code.
 
 If you have any further questions about how to host your own instance of Shutter for a group or cohort, feel free to reach out to me on Slack @maxstellar or at my email!
