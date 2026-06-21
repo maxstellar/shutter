@@ -4,6 +4,7 @@
 	import { X } from 'lucide-svelte';
 	import PromptCard from '$lib/components/PromptCard.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
+	import { cdnImage } from '$lib/actions/cdnImage';
 
 	let lightboxPhotos = $state<{ url: string }[]>([]);
 	let lightboxIndex = $state(0);
@@ -241,22 +242,10 @@
 					<button onclick={() => openLightbox(i)} class="block w-full cursor-pointer">
 						<img
 							src={photo.cdn_url}
+							use:cdnImage={photo.cdn_url}
 							alt=""
 							class="aspect-square w-full object-cover"
 							loading="lazy"
-							onerror={(e) => {
-								const img = e.currentTarget as HTMLImageElement;
-								const attempts = parseInt(img.dataset.attempts ?? '0');
-								if (attempts < 4) {
-									img.dataset.attempts = String(attempts + 1);
-									setTimeout(
-										() => {
-											img.src = photo.cdn_url + '?t=' + Date.now();
-										},
-										1500 * (attempts + 1)
-									);
-								}
-							}}
 						/>
 					</button>
 					<button

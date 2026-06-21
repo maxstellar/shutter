@@ -5,6 +5,7 @@
 	import DayPicker from '$lib/components/DayPicker.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import { fitText } from '$lib/actions/fitText';
+	import { cdnImage } from '$lib/actions/cdnImage';
 
 	const HEART_LIKED = 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f496/emoji.svg';
 	const HEART_OPEN  = 'https://fonts.gstatic.com/s/e/notoemoji/latest/1f90d/emoji.svg';
@@ -188,6 +189,7 @@
 					<button onclick={() => openLightbox(idx)} class="block h-full w-full cursor-pointer">
 						<img
 							src={photo.cdn_url}
+							use:cdnImage={photo.cdn_url}
 							alt=""
 							loading="lazy"
 							class="h-full w-full object-cover transition-opacity group-hover:opacity-95"

@@ -4,6 +4,7 @@
 	import DayPicker from '$lib/components/DayPicker.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import { fitText } from '$lib/actions/fitText';
+	import { cdnImage } from '$lib/actions/cdnImage';
 
 	let { data }: { data: PageData } = $props();
 
@@ -179,6 +180,7 @@
 				<button onclick={() => openLightbox(idx)} class="block h-full w-full cursor-pointer">
 					<img
 						src={photo.cdn_url}
+						use:cdnImage={photo.cdn_url}
 						alt=""
 						loading="lazy"
 						class="h-full w-full object-cover transition-opacity group-hover:opacity-95"

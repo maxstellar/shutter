@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ChevronLeft, ChevronRight, X } from 'lucide-svelte';
+	import { cdnImage } from '$lib/actions/cdnImage';
 
 	type Photo = {
 		url: string;
@@ -99,6 +100,7 @@
 	<div class="flex max-h-[calc(100dvh-160px)] max-w-[90dvw] items-center justify-center" onclick={(e) => e.stopPropagation()}>
 		<img
 			src={photo.url}
+			use:cdnImage={photo.url}
 			alt=""
 			class="max-h-[calc(100dvh-160px)] max-w-[90dvw] rounded-md object-contain"
 		/>

@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
+	import { cdnImage } from '$lib/actions/cdnImage';
 	import { Check, X, Minus, ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -165,6 +166,7 @@ function navDay(offset: number) {
 									<button onclick={() => openLightbox(urls, i)} class="block w-full cursor-pointer">
 										<img
 											src={photo.cdn_url}
+											use:cdnImage={photo.cdn_url}
 											alt=""
 											loading="lazy"
 											class="aspect-square w-full object-cover transition-opacity hover:opacity-90"
