@@ -13,9 +13,18 @@
 			.join('')
 			.toUpperCase()
 	);
+
+	// Fall back to initials if the avatar image fails to load, so a dead/slow
+	// avatar URL never renders the browser's broken-image glyph. Reset whenever
+	// the source changes.
+	let failed = $state(false);
+	$effect(() => {
+		avatarUrl;
+		failed = false;
+	});
 </script>
 
-{#if avatarUrl}
+{#if avatarUrl && !failed}
 	<img
 		src={avatarUrl}
 		alt={name}
@@ -23,6 +32,7 @@
 		height={size}
 		class="rounded-full object-cover"
 		style="width:{size}px;height:{size}px"
+		onerror={() => (failed = true)}
 	/>
 {:else}
 	<div

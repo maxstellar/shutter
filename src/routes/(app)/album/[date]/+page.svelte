@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import DayPicker from '$lib/components/DayPicker.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
+	import UserAvatar from '$lib/components/UserAvatar.svelte';
 	import { fitText } from '$lib/actions/fitText';
 	import { cdnImage } from '$lib/actions/cdnImage';
 
@@ -206,8 +207,8 @@
 							{#if like.count > 0}<span>{like.count}</span>{/if}
 						</button>
 					{/if}
-					<div class="pointer-events-none ml-auto">
-						<span class="truncate text-xs text-white/90">{photo.user_name}</span>
+					<div class="pointer-events-none ml-auto overflow-hidden rounded-full shadow-sm ring-2 ring-white/80">
+						<UserAvatar name={photo.user_name} avatarUrl={photo.user_avatar} size={24} />
 					</div>
 				</div>
 			</div>
