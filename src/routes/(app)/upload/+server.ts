@@ -7,10 +7,10 @@ import { getUploader } from '$lib/server/cdn';
 import { assertUserDayEditable, currentETDay } from '$lib/server/time';
 import { db } from '$lib/server/db';
 import { photos } from '$lib/server/db/schema';
+import { MAX_PHOTOS_PER_DAY } from '$lib/photoLimits';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
-const MAX_PHOTOS_PER_DAY = 5;
 
 export const POST: RequestHandler = async (event) => {
 	requireWhitelisted(event);
@@ -32,7 +32,7 @@ export const POST: RequestHandler = async (event) => {
 	const userId = event.locals.user!.id;
 	const uploader = getUploader();
 
-	// Enforce 5-per-day with a serializable transaction
+	// Enforce the daily photo limit with a serializable transaction
 	let cdnResult: Awaited<ReturnType<typeof uploader.upload>>;
 	try {
 		cdnResult = await uploader.upload(buffer, file.name || 'photo.jpg', mimeType);

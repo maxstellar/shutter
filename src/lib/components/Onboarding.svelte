@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate } from '$app/navigation';
 	import { enablePushSubscription } from '$lib/push';
+	import { MAX_PHOTOS_PER_DAY, MIN_PHOTOS_FOR_STREAK } from '$lib/photoLimits';
 
 	let { onboarded = false, vapidPublicKey = '' }: { onboarded?: boolean; vapidPublicKey?: string } =
 		$props();
@@ -47,7 +48,7 @@
 		{
 			selector: '[data-onboard="upload"]',
 			title: 'Upload your photos',
-			body: 'Tap here each day to take or add up to 5 photos! You need at least 3 to keep your streak alive.',
+			body: `Tap here each day to take or add up to ${MAX_PHOTOS_PER_DAY} photos! You need at least ${MIN_PHOTOS_FOR_STREAK} to keep your streak alive.`,
 			pad: 14
 		},
 		{
