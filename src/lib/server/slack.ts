@@ -100,7 +100,7 @@ export async function sendSlackChannelImages(
 	if (!env.SLACK_BOT_TOKEN) return { ok: false, error: 'slack_not_configured' };
 	if (!channelId || imageUrls.length === 0) return { ok: false, error: 'nothing_to_send' };
 
-	// Slack caps blocks at 50/message; we never send more than 5, but guard anyway.
+	// Slack caps blocks at 50/message; this is currently bounded by the daily photo limit.
 	const blocks = imageUrls.slice(0, 10).map((url) => ({
 		type: 'image',
 		image_url: url,

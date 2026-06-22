@@ -5,6 +5,7 @@
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import { cdnImage } from '$lib/actions/cdnImage';
+	import { MAX_PHOTOS_PER_DAY } from '$lib/photoLimits';
 	import { Check, X, Minus, ChevronLeft, ChevronRight } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -111,7 +112,7 @@ function navDay(offset: number) {
 						<div class="flex items-center gap-2">
 							<UserAvatar name={member.name} avatarUrl={member.avatar_url} size={28} />
 							<span class="text-sm font-medium text-zinc-800 dark:text-zinc-200">{member.name}</span>
-							<span class="text-xs text-zinc-400">{member.photoCount}/5</span>
+							<span class="text-xs text-zinc-400">{member.photoCount}/{MAX_PHOTOS_PER_DAY}</span>
 						</div>
 
 						<div class="flex items-center gap-1">

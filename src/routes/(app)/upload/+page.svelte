@@ -5,6 +5,7 @@
 	import PromptCard from '$lib/components/PromptCard.svelte';
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import { cdnImage } from '$lib/actions/cdnImage';
+	import { MAX_PHOTOS_PER_DAY, MIN_PHOTOS_FOR_STREAK } from '$lib/photoLimits';
 
 	let lightboxPhotos = $state<{ url: string }[]>([]);
 	let lightboxIndex = $state(0);
@@ -37,7 +38,7 @@
 	}
 
 	// Remaining slots
-	let remaining = $derived(5 - data.photos.length);
+	let remaining = $derived(MAX_PHOTOS_PER_DAY - data.photos.length);
 	let canUpload = $derived(remaining > 0);
 
 	let outsideCohort = $derived(
@@ -180,7 +181,8 @@
 		</div>
 	{:else}
 		<p class="page-subtitle mb-6">
-			Add up to 5 photos to the album! You need at least 3 to keep your streak.
+			Add up to {MAX_PHOTOS_PER_DAY} photos to the album! You need at least
+			{MIN_PHOTOS_FOR_STREAK} to keep your streak.
 			<br /><br />
 			<strong
 				>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure
@@ -235,7 +237,7 @@
 			{/if}
 		</div>
 
-		<!-- Photo grid: 5 slots -->
+		<!-- Photo grid -->
 		<div class="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-5">
 			{#each data.photos as photo, i (photo.id)}
 				<div class="group relative overflow-hidden rounded-md">
@@ -308,7 +310,9 @@
 				Upload photo{remaining !== 1 ? 's' : ''} ({remaining} remaining)
 			</button>
 		{:else if remaining === 0}
-			<p class="text-center text-sm text-zinc-500">All 5 slots filled for today.</p>
+			<p class="text-center text-sm text-zinc-500">
+				All {MAX_PHOTOS_PER_DAY} slots filled for today.
+			</p>
 		{/if}
 	{/if}
 </div>
