@@ -4,6 +4,13 @@ A daily photo journal for Hack Club intern cohorts (could potentially be repurpo
 
 Built with SvelteKit, PostgreSQL (Drizzle ORM), and Hack Club OAuth.
 
+## Demo Video
+
+
+https://github.com/user-attachments/assets/a690efa7-af51-4e42-ba46-4244a5ebe2f5
+
+
+
 ## Features
 
 **For members**
