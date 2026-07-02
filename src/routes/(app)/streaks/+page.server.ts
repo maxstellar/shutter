@@ -1,10 +1,14 @@
 import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { computeStreaksForUsers } from '$lib/server/streak';
 import { getWhitelistedSlackIds } from '$lib/server/auth/access';
 
 export const load: PageServerLoad = async ({ locals }) => {
+	// Leaderboard is not part of the demo.
+	if (locals.isDemo) throw redirect(303, '/');
+
 	const [allUsers, whitelistedIds] = await Promise.all([
 		db.select({ id: users.id, name: users.name, avatar_url: users.avatar_url, slack_id: users.slack_id }).from(users),
 		getWhitelistedSlackIds()

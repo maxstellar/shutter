@@ -7,6 +7,9 @@ import { currentETDay } from '$lib/server/time';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
+	// Demo users can only see the single showcase day, served at `/`.
+	if (locals.isDemo) throw redirect(303, '/');
+
 	const { date } = params;
 
 	if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw redirect(303, '/');

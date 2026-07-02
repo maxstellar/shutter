@@ -91,8 +91,9 @@
 	let lightboxOpen = $state(false);
 
 	let outsideCohort = $derived(
-		(!!data.cohortStart && data.today < data.cohortStart) ||
-		(!!data.cohortEnd && data.today > data.cohortEnd)
+		!data.isDemo &&
+			((!!data.cohortStart && data.today < data.cohortStart) ||
+				(!!data.cohortEnd && data.today > data.cohortEnd))
 	);
 
 	let lightboxPhotos = $derived(data.photos.map((p) => {
@@ -118,6 +119,7 @@
 	}
 
 	async function toggleLike(photoId: string) {
+		if (data.isDemo) return; // read-only demo
 		const current = likeState[photoId] ?? {
 			count: data.photos.find((p) => p.id === photoId)!.like_count,
 			liked: data.photos.find((p) => p.id === photoId)!.liked_by_me
@@ -155,6 +157,18 @@
 			</p>
 		</div>
 	{:else}
+		{#if data.isDemo}
+			<div
+				class="mb-6 rounded-md border px-4 py-3 text-sm"
+				style="border-color: color-mix(in srgb, var(--color-accent) 30%, transparent); background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);"
+			>
+				<p class="font-semibold" style="color: var(--color-accent)">You're viewing a demo of Shutter</p>
+				<p class="mt-1 text-zinc-600 dark:text-zinc-400">
+					This is a read-only preview of one day's album. Photos you upload won't be saved, and the
+					leaderboard and other days are only available to interns.
+				</p>
+			</div>
+		{/if}
 		<div class="album-date-row mb-6 flex items-center justify-between gap-3">
 			<h1 class="page-heading" use:fitText>
 				{new Date(data.today + 'T12:00:00').toLocaleDateString('en-US', {
@@ -163,9 +177,11 @@
 					day: 'numeric'
 				})}
 			</h1>
-			<div data-onboard="daypicker">
-				<DayPicker currentDay={data.today} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
-			</div>
+			{#if !data.isDemo}
+				<div data-onboard="daypicker">
+					<DayPicker currentDay={data.today} today={data.today} cohortStart={data.cohortStart} cohortEnd={data.cohortEnd} />
+				</div>
+			{/if}
 		</div>
 
 		{#if data.prompt}
@@ -206,10 +222,10 @@
 					<div class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between bg-linear-to-t from-black/80 via-black/40 to-transparent px-2 pb-2 pt-20">
 						{#if !isOwn || like.count > 0}
 							<button
-								class="pointer-events-auto flex cursor-pointer items-center gap-1.5 text-sm text-white/90 disabled:cursor-not-allowed"
+								class="pointer-events-auto flex cursor-pointer items-center gap-1.5 text-sm text-white/90 disabled:cursor-default"
 								class:heart-pop={burstIds[photo.id] > 0}
-								disabled={isOwn}
-								onclick={(e) => { e.stopPropagation(); if (!isOwn) toggleLike(photo.id); }}
+								disabled={isOwn || data.isDemo}
+								onclick={(e) => { e.stopPropagation(); if (!isOwn && !data.isDemo) toggleLike(photo.id); }}
 								aria-label={isOwn ? `${like.count} likes` : like.liked ? 'Unlike' : 'Like'}
 							>
 								<img src={isOwn || like.liked ? HEART_LIKED : HEART_OPEN} alt="" class="h-5 w-5" style={isOwn || like.liked ? 'filter: drop-shadow(0 0 3px rgba(255,100,100,0.6))' : ''} />

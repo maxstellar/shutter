@@ -37,21 +37,26 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (session) {
 		const [user] = await db.select().from(users).where(eq(users.id, session.user_id)).limit(1);
 		if (user) {
+			const whitelisted = await isWhitelisted(user.slack_id);
 			event.locals.user = user;
 			event.locals.session = session;
-			event.locals.isWhitelisted = await isWhitelisted(user.slack_id);
+			event.locals.isWhitelisted = whitelisted;
 			event.locals.isAdmin = isAdmin(user.slack_id);
+			// Signed in but not whitelisted → demo mode.
+			event.locals.isDemo = !whitelisted;
 		} else {
 			event.locals.user = null;
 			event.locals.session = null;
 			event.locals.isWhitelisted = false;
 			event.locals.isAdmin = false;
+			event.locals.isDemo = false;
 		}
 	} else {
 		event.locals.user = null;
 		event.locals.session = null;
 		event.locals.isWhitelisted = false;
 		event.locals.isAdmin = false;
+		event.locals.isDemo = false;
 	}
 
 	return resolve(event);

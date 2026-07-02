@@ -3,7 +3,6 @@ import { redirect, error } from '@sveltejs/kit';
 import { exchangeCode, fetchHackClubUser } from '$lib/server/auth/hackclub';
 import { fetchSlackAvatar } from '$lib/server/slack';
 import { createSession } from '$lib/server/auth/session';
-import { isWhitelisted } from '$lib/server/auth/access';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -66,9 +65,6 @@ export const GET: RequestHandler = async (event) => {
 	const ua = request.headers.get('user-agent');
 	await createSession(user.id, ua, event);
 
-	if (!(await isWhitelisted(slack_id))) {
-		throw redirect(303, '/ineligible');
-	}
-
+	// Non-whitelisted users land in the read-only demo at `/` rather than /ineligible.
 	throw redirect(303, '/');
 };

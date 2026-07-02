@@ -6,15 +6,20 @@
 	import Lightbox from '$lib/components/Lightbox.svelte';
 	import { cdnImage } from '$lib/actions/cdnImage';
 
+	let { data }: { data: PageData } = $props();
+
+	// Demo users go through the flow locally — nothing is uploaded or persisted.
+	let demoPhotos = $state<{ id: string; cdn_url: string }[]>([]);
+	let demoCounter = 0;
+	let photos = $derived(data.isDemo ? demoPhotos : data.photos);
+
 	let lightboxPhotos = $state<{ url: string }[]>([]);
 	let lightboxIndex = $state(0);
 
 	function openLightbox(index: number) {
-		lightboxPhotos = data.photos.map((p) => ({ url: p.cdn_url }));
+		lightboxPhotos = photos.map((p) => ({ url: p.cdn_url }));
 		lightboxIndex = index;
 	}
-
-	let { data }: { data: PageData } = $props();
 
 	let uploading = $state(false);
 	let error = $state<string | null>(null);
@@ -37,12 +42,13 @@
 	}
 
 	// Remaining slots
-	let remaining = $derived(5 - data.photos.length);
+	let remaining = $derived(5 - photos.length);
 	let canUpload = $derived(remaining > 0);
 
 	let outsideCohort = $derived(
-		(!!data.cohortStart && data.today < data.cohortStart) ||
-			(!!data.cohortEnd && data.today > data.cohortEnd)
+		!data.isDemo &&
+			((!!data.cohortStart && data.today < data.cohortStart) ||
+				(!!data.cohortEnd && data.today > data.cohortEnd))
 	);
 
 	async function stripExifAndUpload(file: File): Promise<{ id: string; cdn_url: string }> {
@@ -103,6 +109,16 @@
 			if (fileInput) fileInput.value = '';
 			return;
 		}
+		if (data.isDemo) {
+			// Local-only preview: never hits the server, CDN, or DB.
+			for (const file of selected) {
+				demoCounter += 1;
+				demoPhotos = [...demoPhotos, { id: `demo-${demoCounter}`, cdn_url: URL.createObjectURL(file) }];
+			}
+			if (fileInput) fileInput.value = '';
+			showToast("Demo mode — your photo isn't saved.");
+			return;
+		}
 		uploading = true;
 		const uploaded: { id: string }[] = [];
 		try {
@@ -124,6 +140,12 @@
 	}
 
 	async function deletePhoto(id: string) {
+		if (data.isDemo) {
+			const p = demoPhotos.find((x) => x.id === id);
+			if (p) URL.revokeObjectURL(p.cdn_url);
+			demoPhotos = demoPhotos.filter((x) => x.id !== id);
+			return;
+		}
 		const res = await fetch(`/upload?id=${id}`, { method: 'DELETE' });
 		if (!res.ok) {
 			const body = await res.json().catch(() => ({}));
@@ -179,16 +201,29 @@
 			</p>
 		</div>
 	{:else}
-		<p class="page-subtitle mb-6">
-			Add up to 5 photos to the album! You need at least 3 to keep your streak.
-			<br /><br />
-			<strong
-				>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure
-				you get consent from your subjects.</strong
+		{#if data.isDemo}
+			<div
+				class="mb-6 rounded-md border px-4 py-3 text-sm"
+				style="border-color: color-mix(in srgb, var(--color-accent) 30%, transparent); background-color: color-mix(in srgb, var(--color-accent) 8%, transparent);"
 			>
-		</p>
+				<p class="font-semibold" style="color: var(--color-accent)">Demo upload</p>
+				<p class="mt-1 text-zinc-600 dark:text-zinc-400">
+					Try adding photos to see how it works — they stay on your device for this preview only and
+					are never uploaded or saved to the album.
+				</p>
+			</div>
+		{:else}
+			<p class="page-subtitle mb-6">
+				Add up to 5 photos to the album! You need at least 3 to keep your streak.
+				<br /><br />
+				<strong
+					>DO NOT SUBMIT SENSITIVE PHOTOS! These photos will be uploaded to Hack Club CDN! Make sure
+					you get consent from your subjects.</strong
+				>
+			</p>
+		{/if}
 		{#if data.prompt}
-			<PromptCard prompt={data.prompt.text} myCount={data.photos.length} />
+			<PromptCard prompt={data.prompt.text} myCount={photos.length} />
 		{/if}
 
 		{#if error}
@@ -200,6 +235,7 @@
 		{/if}
 
 		<!-- Crosspost to Slack -->
+		{#if !data.isDemo}
 		<div class="mb-4 flex items-center gap-2 text-sm">
 			{#if data.crosspostChannelId}
 				<input
@@ -234,10 +270,11 @@
 				</span>
 			{/if}
 		</div>
+		{/if}
 
 		<!-- Photo grid: 5 slots -->
 		<div class="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-5">
-			{#each data.photos as photo, i (photo.id)}
+			{#each photos as photo, i (photo.id)}
 				<div class="group relative overflow-hidden rounded-md">
 					<button onclick={() => openLightbox(i)} class="block w-full cursor-pointer">
 						<img

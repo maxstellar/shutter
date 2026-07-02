@@ -11,10 +11,13 @@ declare global {
 			session: Session | null;
 			isWhitelisted: boolean;
 			isAdmin: boolean;
+			// Logged in but not whitelisted → read-only demo experience.
+			isDemo: boolean;
 		}
 		interface PageData {
 			user: User | null;
 			isAdmin: boolean;
+			isDemo?: boolean;
 			theme: 'light' | 'dark' | null;
 		}
 	}

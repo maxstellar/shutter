@@ -15,8 +15,12 @@
 	let {
 		user,
 		isAdmin,
-		isWhitelisted
-	}: { user: User | null; isAdmin: boolean; isWhitelisted: boolean } = $props();
+		isWhitelisted,
+		isDemo = false
+	}: { user: User | null; isAdmin: boolean; isWhitelisted: boolean; isDemo?: boolean } = $props();
+
+	// Demo users get a trimmed nav (Album + Upload, no Streaks/Admin/Settings).
+	let showNav = $derived(!!user && (isWhitelisted || isDemo));
 
 	let path = $derived($page.url.pathname);
 
@@ -37,7 +41,7 @@
 			>
 		</a>
 
-		{#if user && isWhitelisted}
+		{#if showNav && user}
 			<nav class="flex items-center gap-1">
 				<a
 					href="/upload"
@@ -57,15 +61,17 @@
 					<PhotosIcon size={19} />
 					Album
 				</a>
-				<a
-					href="/streaks"
-					class="flex h-10 items-center gap-2 rounded-md px-3.5 text-base transition-colors"
-					class:nav-active={active('/streaks')}
-					class:nav-idle={!active('/streaks')}
-				>
-					<TrophyIcon size={19} />
-					Streaks
-				</a>
+				{#if isWhitelisted}
+					<a
+						href="/streaks"
+						class="flex h-10 items-center gap-2 rounded-md px-3.5 text-base transition-colors"
+						class:nav-active={active('/streaks')}
+						class:nav-idle={!active('/streaks')}
+					>
+						<TrophyIcon size={19} />
+						Streaks
+					</a>
+				{/if}
 				{#if isAdmin}
 					<a
 						href="/admin"
@@ -79,9 +85,16 @@
 				{/if}
 			</nav>
 
-			<a href="/settings" aria-label="Settings">
-				<UserAvatar name={user.name} avatarUrl={user.avatar_url} size={36} />
-			</a>
+			{#if isWhitelisted}
+				<a href="/settings" aria-label="Settings">
+					<UserAvatar name={user.name} avatarUrl={user.avatar_url} size={36} />
+				</a>
+			{:else}
+				<span class="demo-badge">Demo</span>
+				<form method="POST" action="/logout">
+					<button type="submit" class="demo-signout">Sign out</button>
+				</form>
+			{/if}
 		{/if}
 
 		<ThemeToggle />
@@ -126,13 +139,21 @@
 			<span class="text-xl nav-wordmark" style="color: var(--color-accent)"
 				>Shutter</span
 			>
+			{#if isDemo}<span class="demo-badge">Demo</span>{/if}
 		</a>
-		<ThemeToggle />
+		<div class="flex items-center gap-2">
+			{#if isDemo}
+				<form method="POST" action="/logout">
+					<button type="submit" class="demo-signout">Sign out</button>
+				</form>
+			{/if}
+			<ThemeToggle />
+		</div>
 	</header>
 {/if}
 
 <!-- Mobile bottom nav -->
-{#if user && isWhitelisted}
+{#if showNav}
 	<nav
 		class="bottom-nav-padding fixed right-0 bottom-0 left-0 z-40 flex items-center border-t border-zinc-300 bg-white/90 backdrop-blur sm:hidden dark:border-zinc-800 dark:bg-zinc-950/90"
 	>
@@ -157,16 +178,20 @@
 				<Plus size={30} color="white" strokeWidth={2.5} />
 			</a>
 
-			<a
-				href="/streaks"
-				data-onboard="streaks"
-				class="flex flex-1 flex-col items-center gap-1.5 py-2 text-xs transition-colors"
-				class:bottom-active={active('/streaks')}
-				class:bottom-idle={!active('/streaks')}
-			>
-				<TrophyIcon size={32} />
-				<span>Streaks</span>
-			</a>
+			{#if isWhitelisted}
+				<a
+					href="/streaks"
+					data-onboard="streaks"
+					class="flex flex-1 flex-col items-center gap-1.5 py-2 text-xs transition-colors"
+					class:bottom-active={active('/streaks')}
+					class:bottom-idle={!active('/streaks')}
+				>
+					<TrophyIcon size={32} />
+					<span>Streaks</span>
+				</a>
+			{:else}
+				<div class="flex-1"></div>
+			{/if}
 		</div>
 	</nav>
 {/if}
@@ -199,6 +224,37 @@
 		font-weight: 400;
 		font-feature-settings: 'liga', 'dlig', 'kern';
 		letter-spacing: -0.01em;
+	}
+
+	.demo-badge {
+		display: inline-flex;
+		align-items: center;
+		border-radius: 9999px;
+		padding: 0.125rem 0.5rem;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: var(--color-accent);
+		background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+	}
+
+	.demo-signout {
+		cursor: pointer;
+		border-radius: 0.375rem;
+		padding: 0.375rem 0.75rem;
+		font-size: 0.875rem;
+		color: #71717a;
+		transition: color 0.15s;
+	}
+	.demo-signout:hover {
+		color: #09090b;
+	}
+	:global(html.dark) .demo-signout {
+		color: #a1a1aa;
+	}
+	:global(html.dark) .demo-signout:hover {
+		color: #fafafa;
 	}
 
 	.bottom-active {

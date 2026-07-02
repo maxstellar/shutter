@@ -3,9 +3,12 @@ import { db } from '$lib/server/db';
 import { photos, daily_prompts, prompt_completions } from '$lib/server/db/schema';
 import { and, eq, isNull } from 'drizzle-orm';
 import { currentETDay } from '$lib/server/time';
+import { DEMO_DAY } from '$lib/server/demo';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	const today = currentETDay();
+	// Demo users see the showcase day's prompt to match the album; their uploads
+	// are local-only anyway, so the queried photos are unused for them.
+	const today = locals.isDemo ? DEMO_DAY : currentETDay();
 
 	const [myPhotos, todayPrompt, myCompletion] = await Promise.all([
 		db
@@ -27,6 +30,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		today,
+		isDemo: locals.isDemo,
 		photos: myPhotos,
 		prompt: todayPrompt[0] ?? null,
 		completion: myCompletion[0] ?? null,

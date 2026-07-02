@@ -14,6 +14,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies }) => {
 		user: locals.user,
 		isAdmin: locals.isAdmin,
 		isWhitelisted: locals.isWhitelisted,
+		isDemo: locals.isDemo,
 		theme,
 		cohortStart: validDate(env.COHORT_START),
 		cohortEnd: validDate(env.COHORT_END),

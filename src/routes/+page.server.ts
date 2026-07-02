@@ -4,12 +4,14 @@ import { db } from '$lib/server/db';
 import { photos, users, daily_prompts, prompt_completions, photo_likes } from '$lib/server/db/schema';
 import { and, eq, isNull, desc, sql } from 'drizzle-orm';
 import { currentETDay } from '$lib/server/time';
+import { DEMO_DAY } from '$lib/server/demo';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) throw redirect(303, '/login');
-	if (!locals.isWhitelisted) throw redirect(303, '/ineligible');
 
-	const today = currentETDay();
+	const isDemo = locals.isDemo;
+	// Demo users only ever see the fixed showcase day.
+	const today = isDemo ? DEMO_DAY : currentETDay();
 	const userId = locals.user.id;
 
 	const [todayPhotos, todayPrompt, myCompletion] = await Promise.all([
@@ -44,6 +46,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	return {
 		today,
+		isDemo,
 		photos: todayPhotos,
 		prompt: todayPrompt[0] ?? null,
 		myCompletion: myCompletion[0] ?? null,

@@ -2,11 +2,14 @@ import type { PageServerLoad, Actions } from './$types';
 import { db } from '$lib/server/db';
 import { users, push_subscriptions } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import { parseSlackChannelId, getSlackChannelInfo, slackErrorMessage } from '$lib/server/slack';
 
 export const load: PageServerLoad = async ({ locals, cookies }) => {
+	// Settings aren't part of the demo.
+	if (locals.isDemo) throw redirect(303, '/');
+
 	const subs = await db
 		.select({ id: push_subscriptions.id, endpoint: push_subscriptions.endpoint })
 		.from(push_subscriptions)
